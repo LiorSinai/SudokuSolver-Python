@@ -37,13 +37,15 @@ It can be serialised by concatenating rows instead of stacking them:
 
 > 890070010620003050004000000060040200000085430000100000002700500900200100500400000
 
-The code can read in files from either format.
+This is more space efficient for storing multiple Sudokus.
+
+The code has functionality to read in serialised Sudokus and convert them to a grid.
 
 ## Credit
 
 sudoku_NY.txt puzzles from [https://www.nytimes.com/puzzles/sudoku](https://www.nytimes.com/puzzles/sudoku) (no archives).
 
-sudoku_top95.txt and sudoku_hardest.txt from [https://norvig.com/sudoku.html]](https://norvig.com/sudoku.html)
+sudoku_top95.txt and sudoku_hardest.txt from [https://norvig.com/sudoku.html](https://norvig.com/sudoku.html)
 
 
 
