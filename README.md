@@ -22,16 +22,16 @@ See [www.SudokuWiki.org][SudokuWiki] for more information on strategies.
 
 ## Input files.
 
-A Sudoku in grid form:
-  [8, 9, 0, 0, 7, 0, 0, 1, 0]
-  [6, 2, 0, 0, 0, 3, 0, 5, 0]
-  [0, 0, 4, 0, 0, 0, 0, 0, 0]
-  [0, 6, 0, 0, 4, 0, 2, 0, 0]
-  [0, 0, 0, 0, 8, 5, 4, 3, 0]
-  [0, 0, 0, 1, 0, 0, 0, 0, 0]
-  [0, 0, 2, 7, 0, 0, 5, 0, 0]
-  [9, 0, 0, 2, 0, 0, 1, 0, 0]
-  [5, 0, 0, 4, 0, 0, 0, 0, 0]
+A Sudoku in grid form:  
+  [8, 9, 0, 0, 7, 0, 0, 1, 0]  
+  [6, 2, 0, 0, 0, 3, 0, 5, 0]  
+  [0, 0, 4, 0, 0, 0, 0, 0, 0]  
+  [0, 6, 0, 0, 4, 0, 2, 0, 0]  
+  [0, 0, 0, 0, 8, 5, 4, 3, 0]  
+  [0, 0, 0, 1, 0, 0, 0, 0, 0]  
+  [0, 0, 2, 7, 0, 0, 5, 0, 0]  
+  [9, 0, 0, 2, 0, 0, 1, 0, 0]  
+  [5, 0, 0, 4, 0, 0, 0, 0, 0]  
 
 It can be serialised by concatenating rows instead of stacking them:
 
@@ -43,7 +43,7 @@ The code can read in files from either format.
 
 sudoku_NY.txt puzzles from [https://www.nytimes.com/puzzles/sudoku](https://www.nytimes.com/puzzles/sudoku) (no archives).
 
-sudoku_top95.txt and sudoku_hardest.txt from [https://norvig.com/sudoku.html])(https://norvig.com/sudoku.html)
+sudoku_top95.txt and sudoku_hardest.txt from [https://norvig.com/sudoku.html]](https://norvig.com/sudoku.html)
 
 
 
