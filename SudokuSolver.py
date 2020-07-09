@@ -402,83 +402,6 @@ class Sudoku():
                 # for inds_keep, nums in keeps:
                 #     self.erase(nums, inds, inds_keep)
 
-    ## ------------ Deprecated ------------ ###
-
-    def check_unique(self, arr:List[int], m=SIZE) -> bool:
-        # check if all numbers in an array are unique
-        count = [0] * (m + 1)
-        for x in arr:
-            if x == 0:
-                continue # ignore zeros
-            if count[x] == 0:
-                count[x] += 1
-            else:
-                return False 
-        return True
-
-    def get_pairs(self, indices):
-        count = self.count_candidates(indices)
-        pairs = []
-        for num in count.keys():
-            c = len(count[num])
-            if c == 2:
-                pairs.append(num)
-        # matching pairs (both hidden and naked)
-        pairs_final = []
-        for combo in list(combinations(pairs, 2)): # for every two combinations
-            p1 = count[combo[0]]
-            p2 = count[combo[1]]
-            if p1 == p2:
-                pairs_final.append((p1, combo))
-        return pairs_final    
-
-    def set_unique(self, uniques: List):
-        for num, ij in uniques:
-            i, j = ij
-            self.place_and_erase(i, j, num)
-            self.candidates[i][j] = set([num])
-
-    def check_row(self, r: int) -> bool:
-        return self.check_unique(self.get_row(r))    
-
-    def check_col(self, c: int) -> bool:
-        return self.check_unique(self.get_col(c))
-    
-    def check_box(self, r: int, c: int) -> bool:
-        return self.check_unique(self.get_box(r, c))
-    
-    def check_done_sum(self) -> bool:
-        """ check if each row/column/box has the right checksum"""
-        checksum = 45 # = sum(list(range(SIZE+1))) = 1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9
-        # check rows:
-        for i in range(self.n):
-            if sum(self.get_row(i)) != checksum:
-                return False
-        # check columns
-        for j in range(self.n):
-            if sum(self.get_col(j)) != checksum:
-                return False
-        # check boxes
-        for i0 in range(0, self.n, BOX_SIZE):
-            for j0 in range(0, self.n, BOX_SIZE):
-                if sum(self.get_box(i0, j0)) != checksum:
-                    return False
-        return True
-
-    def set_pairs(self, pairs, indices):
-        for pair_idx, pair_nums in pairs:
-            # remove this pair in every index
-            for i, j in indices:
-                nums = self.candidates[i][j].copy()
-                for num in nums:
-                    if num in pair_nums:
-                        self.candidates[i][j].remove(num)
-            # set it in the 2 pair indices
-            i, j = pair_idx[0]
-            self.candidates[i][j] = set(pair_nums) # note: if pair_nums if a set, use pair_nums.copy()
-            i, j = pair_idx[1] 
-            self.candidates[i][j] = set(pair_nums)
-
 
 
 def solveSudokuBrute(grid):
@@ -543,14 +466,13 @@ def solveSudoku(grid, num_boxes=SIZE, verbose=True, all_solutions=False):
                             return game.grid, False # this call is going nowhere
                         elif len(options) == 1:  # Step 1
                             #game.grid[i][j] = list(options)[0]
-                            game.place_and_erase(i, j, list(options)[0], constraint_prop=True) # Step 2
+                            game.place_and_erase(i, j, list(options)[0]) # Step 2
                             #game.flush_candidates() # full grid cleaning
                             edited = True
             if not edited: # changed nothing in this round -> either done or stuck
-                #if game.check_done(num_boxes=num_boxes):
                 if solved:
                     progress += progress_factor
-                    solution_set.append(arr2str(flatten(game.grid.copy())))
+                    solution_set.append(grid2str(game.grid.copy()))
                     #print(len(solution_set), solution_set[-1])
                     return game.grid, True
                 else:
@@ -575,7 +497,6 @@ def solveSudoku(grid, num_boxes=SIZE, verbose=True, all_solutions=False):
                         #game_next.flush_candidates() # full grid cleaning
                         grid_final, solved = solve(game_next, depth=depth+1, progress_factor=progress_factor)
                         if solved and not all_solutions:
-                            #pass # return multiple solutions
                             break # return 1 solution
                         if progress > progress_update and verbose:
                             print("%.1f" %  (progress*100), end='...')
@@ -665,11 +586,11 @@ if __name__ == '__main__':
     puzzles = [puzzle]
     solutions = [solution]
 
-    # file_name = 'sudoku_top95' +'.txt'  # from https://norvig.com/sudoku.html. Solver at https://www.sudokuwiki.org/sudoku.htm can solve 67, but not 6 
-    # #file_name = 'sudoku_hardest'  +'.txt' # from https://norvig.com/sudoku.html
-    # #file_name = 'Sudoku_NY' +'.txt'  # from the New York Times
-    # with open(file_name, 'r') as f:
-    #     puzzles = f.read().strip().split('\n')
+    file_name = 'sudoku_top95' +'.txt'  # from https://norvig.com/sudoku.html. Solver at https://www.sudokuwiki.org/sudoku.htm can solve 67, but not 6 
+    #file_name = 'sudoku_hardest'  +'.txt' # from https://norvig.com/sudoku.html
+    #file_name = 'Sudoku_NY' +'.txt'  # from the New York Times
+    with open(file_name, 'r') as f:
+        puzzles = f.read().strip().split('\n')
     
     t0 = time.time()
     max_t = [0, -1] # time, k
