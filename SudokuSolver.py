@@ -11,6 +11,7 @@ from typing import List, Tuple, Set
 from itertools import combinations
 import random
 import time
+import eel  # For UI
 
 
 SIZE = 9
@@ -550,107 +551,140 @@ def solveSudoku(grid, num_boxes=SIZE, verbose=True, all_solutions=False):
     return grid_final, solved, info
 
 
-if __name__ == '__main__':
-    # from https://dev.to/aspittel/how-i-finally-wrote-a-sudoku-solver-177g
-    # very easy puzzle
-    puzzle = '530070000600195000098000060800060003400803001700020006060000280000419005000080079'
-    solution = '530070000600195000098000060800060003400803001700020006060000280000419005000080079'
+# if __name__ == '__main__':
+#     # from https://dev.to/aspittel/how-i-finally-wrote-a-sudoku-solver-177g
+#     # very easy puzzle
+#     # puzzle = '530070000600195000098000060800060003400803001700020006060000280000419005000080079'
+#     # solution = '530070000600195000098000060800060003400803001700020006060000280000419005000080079'
 
-    # from https://www.sudokuwiki.org/Weekly_Sudoku.asp
-    # puzzle = '100200000065074800070006900004000000050008704000030000000000600080000057006007089' #403 'unsolvable' - no known logical solution
-    # 404 'unsolvable'
-    puzzle = '400009200000010080005400006004200001050030060700005300500007600090060000002800007'
-    # puzzle[0] = 0  # multiple solutions -> 411 solutions
-    # puzzle = '080001206000020000020305040060010900002050400008000010030704050000030000406100080' # June 7 Extreme
-    # May 24 Extreme -> requires multiple diabolical+extreme strategies
-    puzzle = '003100720700000500050240030000720000006000800000014000060095080005000009049002600'
-    solution = '693158724724963518851247936538726491416539872972814365267495183385671249149382657'
+#     # from https://www.sudokuwiki.org/Weekly_Sudoku.asp
+#     # puzzle = '100200000065074800070006900004000000050008704000030000000000600080000057006007089' #403 'unsolvable' - no known logical solution
+#     # 404 'unsolvable'
+#     # puzzle = '400009200000010080005400006004200001050030060700005300500007600090060000002800007'
+#     # puzzle[0] = 0  # multiple solutions -> 411 solutions
+#     # puzzle = '080001206000020000020305040060010900002050400008000010030704050000030000406100080' # June 7 Extreme
+#     # May 24 Extreme -> requires multiple diabolical+extreme strategies
+#     # puzzle = '003100720700000500050240030000720000006000800000014000060095080005000009049002600'
+#     # solution = '693158724724963518851247936538726491416539872972814365267495183385671249149382657'
 
-    # https://www.nytimes.com/puzzles/sudoku/
-    #puzzle   = '106000050070030004090005200002060007000108000047020000000000803003200006000000002'
-    #solution = '186742359275839164394615278812564937639178425547923681721456893953281746468397512'
+#     # https://www.nytimes.com/puzzles/sudoku/
+#     #puzzle   = '106000050070030004090005200002060007000108000047020000000000803003200006000000002'
+#     #solution = '186742359275839164394615278812564937639178425547923681721456893953281746468397512'
 
-    # https://norvig.com/sudoku.html
-    # puzzle = '.....5.8....6.1.43..........1.5........1.6...3.......553.....61........4.........'  # impossible puzzle with no solution -> column 4, no 1 possible because of triple 5-6 doubles and triple 1s
-    # Arto Inkala Puzzles
-    # puzzle =   '85...24..72......9..4.........1.7..23.5...9...4...........8..7..17..........36.4.'  # not that hard actually
-    #solution = '859612437723854169164379528986147352375268914241593786432981675617425893598736241'
-    # puzzle =   '..53.....8......2..7..1.5..4....53...1..7...6..32...8..6.5....9..4....3......97..' # have to make at least 3 guesses
-    #solution = '145327698839654127672918543496185372218473956753296481367542819984761235521839764'
-    # have to make at least 3 guesses
-    puzzle = '800000000003600000070090200050007000000045700000100030001000068008500010090000400'
-    solution = '812753649943682175675491283154237896369845721287169534521974368438526917796318452'
+#     # https://norvig.com/sudoku.html
+#     # puzzle = '.....5.8....6.1.43..........1.5........1.6...3.......553.....61........4.........'  # impossible puzzle with no solution -> column 4, no 1 possible because of triple 5-6 doubles and triple 1s
+#     # Arto Inkala Puzzles
+#     # puzzle =   '85...24..72......9..4.........1.7..23.5...9...4...........8..7..17..........36.4.'  # not that hard actually
+#     #solution = '859612437723854169164379528986147352375268914241593786432981675617425893598736241'
+#     # puzzle =   '..53.....8......2..7..1.5..4....53...1..7...6..32...8..6.5....9..4....3......97..' # have to make at least 3 guesses
+#     #solution = '145327698839654127672918543496185372218473956753296481367542819984761235521839764'
+#     # have to make at least 3 guesses
+#     # puzzle = '800000000003600000070090200050007000000045700000100030001000068008500010090000400'
+#     # solution = '812753649943682175675491283154237896369845721287169534521974368438526917796318452'
 
-    # https://theconversation.com/good-at-sudoku-heres-some-youll-never-complete-5234
-    # 17 clue puzzle: minimum number of clues for a unique solution to be possible
-    # puzzle   ='000700000100000000000430200000000006000509000000000418000081000002000050040000300' #-> 1 unique solution. Very fun to do
-    # puzzle   ='000000000100000000000430200000000006000509000000000418000081000002000050040000300'# -> 76215 solutions
-    #solution ='264715839137892645598436271423178596816549723759623418375281964982364157641957382'
-    # https://cracking-the-cryptic.web.app/sudoku/PMhgbbQRRb
-    #puzzle =   '029000400000500100040000000000042000600000070500000000700300005010090000000000060'
-    #solution = '329816457867534192145279638931742586684153279572968314796321845418695723253487961'
+#     # https://theconversation.com/good-at-sudoku-heres-some-youll-never-complete-5234
+#     # 17 clue puzzle: minimum number of clues for a unique solution to be possible
+#     # puzzle   ='000700000100000000000430200000000006000509000000000418000081000002000050040000300' #-> 1 unique solution. Very fun to do
+#     # puzzle   ='000000000100000000000430200000000006000509000000000418000081000002000050040000300'# -> 76215 solutions
+#     #solution ='264715839137892645598436271423178596816549723759623418375281964982364157641957382'
+#     # https://cracking-the-cryptic.web.app/sudoku/PMhgbbQRRb
+#     #puzzle =   '029000400000500100040000000000042000600000070500000000700300005010090000000000060'
+#     #solution = '329816457867534192145279638931742586684153279572968314796321845418695723253487961'
 
-    # find non-zero entries
-    #nonempty = get_nonempty(puzzle)
-    nonempty = 81 - puzzle.count('.') - puzzle.count('0')
-    print("num clues: %d" % nonempty)
-    # make multiple solutions
-    # for ij in random.sample(nonempty, k=0):
-    #     i = ij // 9
-    #     j = ij % 9
-    #     puzzle[i][j] = 0
+#     # find non-zero entries
+#     #nonempty = get_nonempty(puzzle)
+#     # nonempty = 81 - puzzle.count('.') - puzzle.count('0')
+#     # print("num clues: %d" % nonempty)
+#     # make multiple solutions
+#     # for ij in random.sample(nonempty, k=0):
+#     #     i = ij // 9
+#     #     j = ij % 9
+#     #     puzzle[i][j] = 0
 
-    puzzles = [puzzle]
-    solutions = [solution]
+#     # puzzles = [puzzle]
+#     # solutions = [solution]
 
-    # from https://norvig.com/sudoku.html. Solver at https://www.sudokuwiki.org/sudoku.htm can solve 67, but not 6
-    file_name = 'sudoku_top95' + '.txt'
+#     # from https://norvig.com/sudoku.html. Solver at https://www.sudokuwiki.org/sudoku.htm can solve 67, but not 6
+#     # file_name = 'sudoku_top95' + '.txt'
 
-    # file_name = 'sudoku_hardest'  +'.txt' # from https://norvig.com/sudoku.html
-    # file_name = 'Sudoku_NY' +'.txt'  # from the New York Times
-    with open(file_name, 'r') as f:
-        puzzles = f.read().strip().split('\n')
+#     # file_name = 'sudoku_hardest'  +'.txt' # from https://norvig.com/sudoku.html
+#     # file_name = 'Sudoku_NY' +'.txt'  # from the New York Times
+#     # with open(file_name, 'r') as f:
+#     #     puzzles = f.read().strip().split('\n')
+#     # eel.
+#     puzzles = "52...6.........7.13...........4..8..6......5...........418.........3..2...87.....".strip().split('\n')
+#     # t0 = time.time()
+#     # max_t = [0, -1]  # time, k
+#     max_calls, max_depth = [0, 0, -1], [0, 0, -1]  # [calls, max depth, k]
+#     num_solved = 0
+#     mean_calls = 0
+#     for k, puzzle in enumerate(puzzles):
+#         # for k, puzzle in enumerate([puzzles[86]]):
+#         # print
+#         #S = Sudoku(str2grid(puzzle))
+#         # print(S)
+#         # solve
+#         # tk0 = time.time()
+#         puzzle = str2grid(puzzle)
+#         my_solution, done, info = solveSudoku(
+#             puzzle, verbose=False, all_solutions=False)
+#         #my_solution, done, info = solveSudokuBrute(puzzle)
+#         # deltaTk = time.time() - tk0
+#         num_solved += done
+#         # update average
+#         mean_calls = (mean_calls * k + info['calls']) / (k + 1)
+#         # set maximums
+#         # max_t = max(max_t, [deltaTk, k])
+#         max_calls = max(max_calls, [info['calls'], info['max depth'], k])
+#         # max_depth = max(max_depth, [info['calls'],
+#         # info['max depth'], k], key=lambda x: x[1])
+#         if info['solutions'] > 1:
+#             print('error: puzzle %d has %d solution' % (k, info['solutions']))
+#     # deltaT = time.time() - t0
+#     # print(' ')
+#     # print("number solved: %d/%d" % (num_solved, len(puzzles)))
+#     # print("total time: %.5fs; average time: %.5fs," %
+#     #       (deltaT, deltaT/len(puzzles)))
+#     # print("max time, # puzzle ", max_t)
+#     # print("max calls, depth, # puzzle:", max_calls)
+#     # print("calls, max(max depth), # puzzle:", max_depth)
+#     # print("average calls: %.1f" % mean_calls)
 
-    t0 = time.time()
-    max_t = [0, -1]  # time, k
-    max_calls, max_depth = [0, 0, -1], [0, 0, -1]  # [calls, max depth, k]
-    num_solved = 0
-    mean_calls = 0
-    for k, puzzle in enumerate(puzzles):
-        # for k, puzzle in enumerate([puzzles[86]]):
-        # print
-        #S = Sudoku(str2grid(puzzle))
-        # print(S)
-        # solve
-        tk0 = time.time()
-        puzzle = str2grid(puzzle)
-        my_solution, done, info = solveSudoku(
-            puzzle, verbose=False, all_solutions=False)
-        #my_solution, done, info = solveSudokuBrute(puzzle)
-        deltaTk = time.time() - tk0
-        num_solved += done
-        # update average
-        mean_calls = (mean_calls * k + info['calls']) / (k + 1)
-        # set maximums
-        max_t = max(max_t, [deltaTk, k])
-        max_calls = max(max_calls, [info['calls'], info['max depth'], k])
-        max_depth = max(max_depth, [info['calls'],
-                                    info['max depth'], k], key=lambda x: x[1])
-        if info['solutions'] > 1:
-            print('error: puzzle %d has %d solution' % (k, info['solutions']))
-    deltaT = time.time() - t0
-    print(' ')
-    print("number solved: %d/%d" % (num_solved, len(puzzles)))
-    print("total time: %.5fs; average time: %.5fs," %
-          (deltaT, deltaT/len(puzzles)))
-    print("max time, # puzzle ", max_t)
-    print("max calls, depth, # puzzle:", max_calls)
-    print("calls, max(max depth), # puzzle:", max_depth)
-    print("average calls: %.1f" % mean_calls)
+#     # print(' ')
+#     # print("Solutions:", info['solutions'])
+#     # solution = str2grid(solutions[k])
+#     # print("The solution is correct: ", grid_equal(my_solution, solution))
+#     # S = Sudoku(my_solution)
+#     # print(S)
+#     print(info['solution set'][0])
 
-    # print(' ')
-    # print("Solutions:", info['solutions'])
-    # solution = str2grid(solutions[k])
-    # print("The solution is correct: ", grid_equal(my_solution, solution))
-    # S = Sudoku(my_solution)
-    # print(S)
+
+#### For UI ####
+eel.init('.//UI')  # path of the webpage folder
+
+
+@eel.expose
+def solveIt(puzzle):
+    try:
+        puzzles = puzzle.strip().split('\n')
+        max_calls, max_depth = [0, 0, -1], [0, 0, -1]  # [calls, max depth, k]
+        mean_calls = 0
+        for k, puzzle in enumerate(puzzles):
+            puzzle = str2grid(puzzle)
+            my_solution, done, info = solveSudoku(
+                puzzle, verbose=False, all_solutions=False)
+            mean_calls = (mean_calls * k + info['calls']) / (k + 1)
+            max_calls = max(max_calls, [info['calls'], info['max depth'], k])
+            if info['solutions'] > 1:
+                print('error: puzzle %d has %d solution' %
+                      (k, info['solutions']))
+            if not done:
+                return ""
+
+        # print(info['solution set'][0])
+        return (info['solution set'][0])
+    except IndexError:
+        return ""
+
+
+eel.start('index.html', size=(730, 650))
