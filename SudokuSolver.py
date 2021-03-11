@@ -687,4 +687,4 @@ def solveIt(puzzle):
         return ""
 
 
-eel.start('index.html', size=(730, 650))
+eel.start('index.html', size=(600, 640))

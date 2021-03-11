@@ -1,11 +1,12 @@
 async function tellToSolve() {
   let toSolve = "";
   for (var i = 0; i < 81; i++) {
-    let val = document.getElementById("in_" + i).value;
-    if (val != "") {
-      toSolve += val;
+    let element = document.getElementById("in_" + i);
+    if (element.value != "" && 1 <= element.value <= 9) {
+      toSolve += element.value;
     } else {
       toSolve += ".";
+      element.classList.add("ai");
     }
   }
   let topText = document.getElementById("topText");
@@ -51,7 +52,7 @@ function draw() {
       toAdd += "</tr><tr>";
     }
     toAdd +=
-      "<td><input type='text' oninput='changed(this)' onclick='changed(this)' onfocus='changed(this)' class='inputs' maxlength='2' oninput=\"this.value=this.value.replace(/[^1-9]/g,'')\" id='in_" +
+      "<td><input type='number' oninput='changed(this)' onclick='changed(this)' onfocus='changed(this)' class='inputs' maxlength='2' oninput=\"this.value=this.value.replace(/[^1-9]/g,'')\" id='in_" +
       i +
       "'/></td>";
 
@@ -62,15 +63,22 @@ function draw() {
   document.getElementById("theTable").innerHTML = toAdd;
 }
 function clearThem() {
+  let topText = document.getElementById("topText");
+  topText.innerHTML = "Enter your Sudoku";
+  topText.classList.remove("success");
+  topText.classList.remove("error");
   for (let i = 0; i < 81; i++) {
     let id = "in_" + i;
-    document.getElementById(id).value = "";
+    let element = document.getElementById(id);
+    element.value = "";
+    element.classList.remove("ai");
   }
 }
 function changed(element) {
   if (element.value[1]) {
     element.value = element.value[1];
   } else if (element.value[0]) {
+    element.classList.remove("ai");
     //pass
   } else {
     element.value = "";
