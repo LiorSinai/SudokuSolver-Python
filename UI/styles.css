@@ -1,0 +1,221 @@
+@font-face {
+  font-family: Sacramento;
+  src: url("Sacramento.ttf");
+}
+@font-face {
+  font-family: IndieFlower;
+  src: url("IndieFlower.ttf");
+}
+:root {
+  user-select: none;
+  --background: #212121;
+  --lines: #0e7a7e;
+  --beforeBg: #323232;
+  --hover: #494949;
+  --focus: #494949;
+  --number: #14ffec;
+  --button: #323232;
+  --buttonHover: #494949;
+  --credit: #00adb5;
+  --creditHover: #be3144;
+  --error: #be3144;
+  --success: #52d681;
+  --scrollColor: #323232;
+  --aiInput: #808080;
+  --aiInputHover: #acacac;
+}
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--background);
+}
+h1,
+h3 {
+  color: var(--lines);
+  text-align: center;
+  font-family: "IndieFlower", sans-serif;
+  margin-bottom: 0.5rem;
+}
+.aTag {
+  font-family: "IndieFlower", sans-serif;
+  font-size: 1.3rem;
+  color: var(--credit);
+  text-decoration: none;
+  transition-duration: 0.5s;
+  display: inline;
+  background-color: #0000;
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
+.aTag:hover {
+  color: var(--creditHover);
+  transition-duration: 0.5s;
+}
+.error {
+  color: var(--error);
+}
+.success {
+  color: var(--success);
+}
+
+.inputs {
+  font-family: "Sacramento";
+  font-weight: bolder;
+  width: 2.8rem !important;
+  height: 2.8rem !important;
+  font-size: 1.8rem;
+  text-align: center;
+  caret-color: transparent;
+  border: none;
+  padding: 5px 3px 0 2px;
+  border-radius: 1.5rem;
+  color: var(--lines);
+  background-color: var(--beforeBg);
+  margin: 0.2rem;
+  cursor: pointer;
+  transition-duration: 0.5s;
+}
+.inputs:focus {
+  border: none;
+  outline: none;
+  color: var(--number);
+  background-color: var(--focus);
+  transition-duration: 0.5s;
+  transform: scale(1.1);
+}
+.inputs:hover {
+  color: var(--number);
+  background-color: var(--hover);
+  transition-duration: 0.5s;
+  transform: scale(1.1);
+}
+.inputs::selection {
+  background-color: inherit;
+}
+
+.inputs::-webkit-outer-spin-button,
+.inputs::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+.inputs[type="number"] {
+  -moz-appearance: textfield;
+}
+.ai {
+  color: var(--aiInput);
+}
+.ai:hover,
+.ai:focus {
+  color: var(--aiInputHover);
+}
+
+.theContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+table {
+  outline: none;
+  border-collapse: collapse;
+  font-family: sans-serif;
+  border-color: gold;
+}
+
+colgroup {
+  border: solid medium;
+  outline: none;
+  border-color: var(--lines);
+}
+tbody {
+  border: none;
+  outline: none;
+  border-color: var(--lines);
+}
+
+td {
+  outline: none;
+  border: none;
+  padding: 0;
+}
+
+#tBodyTop {
+  border-bottom: solid medium;
+  border-color: var(--lines);
+}
+#tBodyMid {
+  border-bottom: solid medium;
+  border-color: var(--lines);
+}
+#tBodyBot {
+  padding: 20px;
+  border-top: solid medium;
+  border-color: var(--lines);
+}
+#col1 {
+  border-top: none;
+  border-left: none;
+  border-bottom: none;
+  padding: 0;
+}
+#col2 {
+  padding: 0;
+  border-top: none;
+  border-bottom: none;
+}
+#col3 {
+  padding: 0;
+  border-top: none;
+  border-right: none;
+  border-bottom: none;
+}
+.btnContainer {
+  padding-top: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.button {
+  width: 9rem;
+  background-color: var(--button);
+  color: var(--lines);
+  outline: none;
+  border: none;
+  padding: 0.65rem;
+  font-size: 1.5rem;
+  font-family: "IndieFlower", sans-serif;
+  font-weight: 500;
+  border-radius: 0.7rem;
+  text-align: center;
+  margin: 0 0.9rem 0;
+  font-weight: bold;
+  cursor: pointer;
+  transition-duration: 0.5s;
+}
+.button:hover,
+.button:focus {
+  background-color: var(--buttonHover);
+  color: var(--number);
+  transform: scale(1.08);
+  transition-duration: 0.5s;
+}
+
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+  cursor: auto;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #0000;
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
+  background: var(--scrollColor);
+}
