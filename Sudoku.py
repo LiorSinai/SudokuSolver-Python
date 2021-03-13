@@ -2,7 +2,7 @@
 
 31 May 2020
 
-Sudoku Solver
+Sudoku class
 
 """
 from typing import List, Tuple, Set
@@ -73,21 +73,30 @@ class Sudoku():
             count[x] += 1
         return count
 
-    def is_unique(self, arr: List[int], m=SIZE) -> bool:
-        """ verify that all numbers that are used are unique """
-        count = self.counting(arr, m=m)
-        for c in count[1:]:  # ignore 0
-            if c > 1:
-                return False
-        return True
-
     def all_unique(self, arr: List[int], m=SIZE) -> bool:
         """ verify that all numbers are used, and at most once """
         count = self.counting(arr, m=m)
         for c in count[1:]:  # ignore 0
             if c != 1:
-                return False
+                return False # not unique
         return True
+
+    def no_duplicates(self, arr):
+        """ verify that no number is used more than once """
+        count = self.counting(arr)
+        for c in count[1:]:  # exclude 0:
+            if c > 1:
+                return False  # more than 1 of value
+        return True
+
+    def all_exist(self, arr):
+        """ verify that there is at least one of each number present """
+        count = self.counting(arr)
+        missing = None
+        for num, c in enumerate(count[1:]):  # exclude 0:
+            if c == 0:
+                return False, num+1  # no value or candidate exists
+        return True, missing
 
     def check_done(self, num_boxes=SIZE) -> bool:
         """ check if each row/column/box only has unique elements"""
@@ -104,21 +113,6 @@ class Sudoku():
             for j0 in range(0, self.n, BOX_SIZE):
                 if not self.all_unique(self.get_box(i0, j0)):
                     return False
-        return True
-
-    def all_values(self, arr):
-        count = self.counting(arr)
-        missing = None
-        for num, c in enumerate(count[1:]):  # exclude 0:
-            if c == 0:
-                return False, num+1  # no value or candidate exists
-        return True, missing
-
-    def no_duplicates(self, arr):
-        count = self.counting(arr)
-        for c in count[1:]:  # exclude 0:
-            if c > 1:
-                return False  # no value or candidate exists
         return True
 
     def get_candidates(self, start, end):
@@ -142,16 +136,16 @@ class Sudoku():
             inds = [(i, j) for i in range(self.n)]
             cols_set.append(inds)
         # check rows and columns
-        type = ['row', 'column']
+        type_ = ['row', 'column']
         for t, inds_set in enumerate([rows_set, cols_set]):
             for k, inds in enumerate(inds_set):
                 arr = [self.grid[i][j] for i, j in inds]
                 if not self.no_duplicates(arr):
-                    return False, 'Duplicate values in %s %d' % (type[t], k)
+                    return False, 'Duplicate values in %s %d' % (type_[t], k)
                 arr += list(self.get_candidates(inds[0], inds[-1]))
-                possible, missing = self.all_values(arr)
+                possible, missing_num = self.all_exist(arr)
                 if not possible:
-                    return False, '%d not placeable in %s %d' % (missing, type[t], k)
+                    return False, '%d not placeable in %s %d' % (missing_num, type_[t], k)
         # check boxes
         for i0 in range(0, self.n, BOX_SIZE):
             for j0 in range(0, self.n, BOX_SIZE):
@@ -161,9 +155,9 @@ class Sudoku():
                 for i in range(i0, i0 + BOX_SIZE):
                     for j in range(j0, j0 + BOX_SIZE):
                         arr += list(self.candidates[i][j])
-                possible, missing = self.all_values(arr)
+                possible, missing_num = self.all_exist(arr)
                 if not possible:
-                    return False, '%d not placeable in box (%d, %d)' % (missing, i0, j0)
+                    return False, '%d not placeable in box (%d, %d)' % (missing_num, i0, j0)
         return True, None
 
     ## ------- Candidate functions -------- ##
