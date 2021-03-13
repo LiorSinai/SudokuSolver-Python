@@ -17,13 +17,13 @@ class SudokuTest(unittest.TestCase):
     def check_unique_test(self):
         s = Sudoku([[1]])
         arr = [1,2 ,3, 4, 5]
-        self.assertTrue(s.check_unique(arr))
+        self.assertTrue(s.is_unique(arr))
         arr = [1,2 ,2, 1]
-        self.assertFalse(s.check_unique(arr))
+        self.assertFalse(s.is_unique(arr))
         arr = [i for i in range(10)]    
-        self.assertTrue(s.check_unique(arr))
+        self.assertTrue(s.is_unique(arr))
         arr += [9]
-        self.assertFalse(s.check_unique(arr))
+        self.assertFalse(s.is_unique(arr))
 
 
     def check_row_test(self):
@@ -37,9 +37,9 @@ class SudokuTest(unittest.TestCase):
                 [8, 0, 0, 0, 0, 0, 0, 0, 0],
                 [9, 0, 0, 0, 0, 0, 0, 0, 0]]
         s = Sudoku(grid)
-        self.assertTrue(s.check_row(0))
-        self.assertTrue(s.check_row(1))
-        self.assertFalse(s.check_row(2))
+        self.assertTrue(s.is_unique(grid[0]))
+        self.assertTrue(s.is_unique(grid[1]))
+        self.assertFalse(s.is_unique(grid[2]))
 
 
     def check_col_test(self):
@@ -54,13 +54,13 @@ class SudokuTest(unittest.TestCase):
                  [9, 1, 8, 0, 0, 0, 0, 0, 0]]
         s = Sudoku(grid)
         self.assertEqual(s.get_col(0), [1, 2, 3, 4, 5, 6, 7, 8, 9])
-        self.assertTrue(s.check_col(0))
+        self.assertTrue(s.is_unique(s.get_col(0)))
         self.assertEqual(s.get_col(1), [9, 8, 7, 6, 5, 4, 3, 2, 1])
-        self.assertTrue(s.check_col(1))
+        self.assertTrue(s.is_unique(s.get_col(1)))
         self.assertEqual(s.get_col(3), [4, 0, 0, 0, 0, 0, 0, 0, 0])
-        self.assertTrue(s.check_col(3))
+        self.assertTrue(s.is_unique(s.get_col(3)))
         self.assertEqual(s.get_col(2), [3, 1, 2, 3, 4, 5, 6, 7, 8])
-        self.assertFalse(s.check_col(2))
+        self.assertFalse(s.is_unique(s.get_col(2)))
 
     
     def check_box_test(self):
@@ -79,13 +79,13 @@ class SudokuTest(unittest.TestCase):
         self.assertEqual(s.get_box(0,0), box)
         self.assertEqual(s.get_box(1,2), box)
         self.assertEqual(s.get_box(2,2), box)
-        self.assertTrue(s.check_box(0, 0))
+        self.assertTrue(s.is_unique(s.get_box(0, 0)))
         # different indices for the middle box:
         box = [1, 2, 2, 4, 5, 6, 7, 8, 8]
         self.assertEqual(s.get_box(4,4), box)
         self.assertEqual(s.get_box(3,3), box)
         self.assertEqual(s.get_box(3,5), box)
-        self.assertFalse(s.check_box(4, 4))
+        self.assertFalse(s.is_unique(s.get_box(4, 4)))
 
     
     def find_options_test(self):
@@ -245,20 +245,6 @@ class SudokuTest(unittest.TestCase):
             s.flush_candidates()
             self.assertTrue(s.check_possible()[0])
 
-
-    # def check_solver(self):
-    #     # first try a tiny dummy grid. Solution is not unique
-    #     s = Sudoku()
-    #     grid = [[0, 1, 0],
-    #             [2, 3, 9],
-    #             [0, 8, 5]]
-    #     sol = [[4, 1, 6],
-    #            [2, 3, 9],
-    #            [7, 8, 5]]
-    #     grid_sol, _ = solveSudoku(grid, num_boxes=1)
-    #     #try the partial version of the NY grid
-    #     mySol, _ = solveSudoku(easy_par)
-    #     self.assertTrue(grid_equal(easy_sol, mySol))
 
     def check_solver(self):
         # easy Sudokus (no backtracking required). From New York Times, 31 May 2020 - 2 June 2020

@@ -144,6 +144,14 @@ class Sudoku():
             count[x] += 1
         return count
 
+    def is_unique(self, arr: List[int], m=SIZE) -> bool:
+        """ verify that all numbers are used, and at most once """
+        count = self.counting(arr, m=m)
+        for c in count[1:]:  # ignore 0
+            if c > 1:
+                return False
+        return True
+
     def all_unique(self, arr: List[int], m=SIZE) -> bool:
         """ verify that all numbers are used, and at most once """
         count = self.counting(arr, m=m)
@@ -687,4 +695,4 @@ def solveIt(puzzle):
         return ""
 
 
-eel.start('index.html', size=(600, 640))
+#eel.start('index.html', size=(600, 640))
