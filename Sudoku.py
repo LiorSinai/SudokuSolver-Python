@@ -13,11 +13,12 @@ BOX_SIZE = 3
 
 
 class Sudoku():
-    def __init__(self, grid: List):
+    def __init__(self, grid: List, is_X_Sudoku=False):
         n = len(grid)
         #assert len(grid[0]) == n, "Grid is not square. n_rows=%d, n_columns=%d" % (n, len(grid[0]))
         self.grid = grid
         self.n = n
+        self.is_X_Sudoku = is_X_Sudoku
         # create a grid of viable candidates for each position
         candidates = []
         for i in range(n):
@@ -57,12 +58,38 @@ class Sudoku():
             box.append(self.grid[i][j])
         return box
 
+    def get_diagonals(self, r: int, c: int):
+        diag = []
+        if self.is_X_Sudoku:
+            if r==c:
+                for i in range(self.n):
+                    diag.append(self.grid[i][i])
+            if r==(self.n - c - 1):
+                for i in range(self.n):
+                        diag.append(self.grid[i][self.n - i - 1])
+        return diag
+
+    def get_neighbour_inds(self, r: int, c: int, flatten=False):
+        inds_row = [(r, j) for j in range(self.n)]
+        inds_col = [(i, c) for i in range(self.n)]
+        inds_box = self.get_box_inds(r, c)
+        inds_diag = []
+        if self.is_X_Sudoku:
+            if r == c:
+                inds_diag.extend([(i, i) for i in range(self.n)])
+            if r== (self.n - c - 1):
+                inds_diag.extend([(i, self.n - i - 1) for i in range(self.n)])
+        if flatten:
+            return list(set(inds_row + inds_col + inds_box + inds_diag ))
+        return [inds_row, inds_col, inds_box, inds_diag]
+
     def find_options(self, r: int, c: int) -> Set:
         nums = set(range(1, SIZE + 1))
         set_row = set(self.get_row(r))
         set_col = set(self.get_col(c))
         set_box = set(self.get_box(r, c))
-        used = set_row | set_col | set_box
+        set_diagonals = set(self.get_diagonals(r, c)) if self.is_X_Sudoku else set()
+        used = set_row | set_col | set_box | set_diagonals
         valid = nums.difference(used)
         return valid
 
@@ -167,23 +194,20 @@ class Sudoku():
         self.grid[r][c] = x
         self.candidates[r][c] = set()
         # remove candidate  x in neighbours
-        inds_row = [(r, j) for j in range(self.n)]
-        inds_col = [(i, c) for i in range(self.n)]
-        inds_box = self.get_box_inds(r, c)
+        inds_neighbours = self.get_neighbour_inds(r, c, flatten=True)
         erased = [(r, c)]  # set of indices for constraint propogration
-        erased += self.erase([x], inds_row + inds_col + inds_box, [])
+        erased += self.erase([x], inds_neighbours, [])
         # constraint propogation, through every index that was changed
         while erased and constraint_prop:
             i, j = erased.pop()
-            inds_row = [(i, j) for j in range(self.n)]
-            inds_col = [(i, j) for i in range(self.n)]
-            inds_box = self.get_box_inds(i, j)
-            for inds in [inds_row, inds_col, inds_box]:
+            inds_neighbours = self.get_neighbour_inds(i, j, flatten=False)
+            for inds in inds_neighbours:
                 uniques = self.get_unique(inds, type=[1, 2, 3])
                 for inds_combo, combo in uniques:
                     # passing back the erased here doesn't seem to be very helpful
                     self.set_candidates(combo, inds_combo)
                     erased += self.erase(combo, inds, inds_combo)
+            inds_box = self.get_box_inds(i, j)
             pointers = self.pointing_combos(inds_box)
             for line, inds_pointer, num in pointers:
                 erased += self.erase(num, line, inds_pointer)

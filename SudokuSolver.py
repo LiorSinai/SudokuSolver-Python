@@ -118,7 +118,7 @@ def solveSudokuBrute(grid):
     return grid, solved, info
 
 
-def solveSudoku(grid, num_boxes=SIZE, verbose=True, all_solutions=False):
+def solveSudoku(grid, num_boxes=SIZE, verbose=True, all_solutions=False, is_X_Sudoku=False):
     """
     idea based on https://dev.to/aspittel/how-i-finally-wrote-a-sudoku-solver-177g
     Try each step until failure, and repeat:
@@ -184,7 +184,7 @@ def solveSudoku(grid, num_boxes=SIZE, verbose=True, all_solutions=False):
     progress, update_increment, progress_update = 0.0, 0.01, 0.01
     solution_set = []
 
-    game = Sudoku(grid)
+    game = Sudoku(grid, is_X_Sudoku=is_X_Sudoku)
     game.flush_candidates()  # check for obvious candidates
 
     possible, message = game.check_possible()

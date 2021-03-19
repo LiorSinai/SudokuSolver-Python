@@ -360,6 +360,16 @@ class SudokuTest(unittest.TestCase):
             self.assertTrue(grid_equal(solution, solver_sol))
 
 
+    def solve_X_sudoku(self):
+        puzzle   = '060050200000000060532008000000049103000100050000000007005010008004000006000006500'
+        solution = '968751234741392865532468719257649183493187652186235497675914328814523976329876541'
+        puzzle, solution = str2grid(puzzle), str2grid(solution)
+        solution_set, done, _ = solveSudoku(puzzle, verbose=False, all_solutions=False, is_X_Sudoku=True)
+        self.assertTrue(done)
+        solver_sol = str2grid(solution_set[0])
+        self.assertTrue(grid_equal(solution, solver_sol))
+
+
 def suite():
     "Set order of tests in ascending order of complexity and code required"
     suite = unittest.TestSuite()
@@ -379,6 +389,7 @@ def suite():
     # smoke test
     suite.addTest(SudokuTest('check_solver'))
     suite.addTest(SudokuTest('check_solved_puzzles'))
+    suite.addTest(SudokuTest('solve_X_sudoku'))
     return suite
 
 
