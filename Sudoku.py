@@ -60,13 +60,12 @@ class Sudoku():
 
     def get_diagonals(self, r: int, c: int):
         diag = []
-        if self.is_X_Sudoku:
-            if r==c:
-                for i in range(self.n):
-                    diag.append(self.grid[i][i])
-            if r==(self.n - c - 1):
-                for i in range(self.n):
-                        diag.append(self.grid[i][self.n - i - 1])
+        if r==c:
+            for i in range(self.n):
+                diag.append(self.grid[i][i])
+        if r==(self.n - c - 1):
+            for i in range(self.n):
+                    diag.append(self.grid[i][self.n - i - 1])
         return diag
 
     def get_neighbour_inds(self, r: int, c: int, flatten=False):
