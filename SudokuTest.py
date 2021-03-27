@@ -361,13 +361,22 @@ class SudokuTest(unittest.TestCase):
 
 
     def solve_X_sudoku(self):
-        puzzle   = '060050200000000060532008000000049103000100050000000007005010008004000006000006500'
-        solution = '968751234741392865532468719257649183493187652186235497675914328814523976329876541'
-        puzzle, solution = str2grid(puzzle), str2grid(solution)
-        solution_set, done, _ = solveSudoku(puzzle, verbose=False, all_solutions=False, is_X_Sudoku=True)
-        self.assertTrue(done)
-        solver_sol = str2grid(solution_set[0])
-        self.assertTrue(grid_equal(solution, solver_sol))
+        puzzles = [
+            (
+                '060050200000000060532008000000049103000100050000000007005010008004000006000006500',
+                '968751234741392865532468719257649183493187652186235497675914328814523976329876541'
+            ),
+            (
+                '030040200520006700000000000080020170000070000050000003400000032000600000000080691',
+                '638547219521936748749218365984325176362179584157864923496751832813692457275483691'
+            )
+        ]
+        for puzzle, solution in puzzles:
+            puzzle, solution = str2grid(puzzle), str2grid(solution)
+            solution_set, done, info = solveSudoku(puzzle, verbose=False, all_solutions=False, is_X_Sudoku=True)
+            self.assertTrue(done)
+            solver_sol = str2grid(solution_set[0])
+            self.assertTrue(grid_equal(solution, solver_sol))
 
 
 def suite():
