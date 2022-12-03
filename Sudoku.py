@@ -161,8 +161,13 @@ class Sudoku():
         for j in range(self.n):
             inds = [(i, j) for i in range(self.n)]
             cols_set.append(inds)
-        # check rows and columns
-        type_ = ['row', 'column']
+        # get diagonals
+        diags_set = []
+        if self.is_X_Sudoku:
+            diags_set.append(self.get_diagonals(0, 0))
+            diags_set.append(self.get_diagonals(0, self.n-1))
+        # check rows, columns and diagonals
+        type_ = ['row', 'column', 'diagonal']
         for t, inds_set in enumerate([rows_set, cols_set]):
             for k, inds in enumerate(inds_set):
                 arr = [self.grid[i][j] for i, j in inds]
@@ -184,7 +189,7 @@ class Sudoku():
                 possible, missing_num = self.all_exist(arr)
                 if not possible:
                     return False, '%d not placeable in box (%d, %d)' % (missing_num, i0, j0)
-        return True, None
+        return True, ""
 
     ## ------- Candidate functions -------- ##
     def place_and_erase(self, r: int, c: int, x: int, constraint_prop=True):
@@ -196,7 +201,7 @@ class Sudoku():
         inds_neighbours = self.get_neighbour_inds(r, c, flatten=True)
         erased = [(r, c)]  # set of indices for constraint propogration
         erased += self.erase([x], inds_neighbours, [])
-        # constraint propogation, through every index that was changed
+        # constraint propagation, through every index that was changed
         while erased and constraint_prop:
             i, j = erased.pop()
             inds_neighbours = self.get_neighbour_inds(i, j, flatten=False)

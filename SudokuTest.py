@@ -7,7 +7,7 @@ Sudoku Solver
 """
 
 from Sudoku import Sudoku
-from SudokuSolver import Sudoku, solveSudoku, grid_equal, str2grid, grid2str
+from SudokuSolver import Sudoku, solve_sudoku, grid_equal, str2grid, grid2str
 import unittest
 
 
@@ -263,7 +263,7 @@ class SudokuTest(unittest.TestCase):
         ]
         for puzzle, solution in puzzles:
             puzzle, solution = list(map(str2grid, [puzzle, solution]))
-            solution_set, done, _ = solveSudoku(puzzle, verbose=False, all_solutions=False)
+            solution_set, done, _ = solve_sudoku(puzzle, verbose=False, all_solutions=False)
             self.assertTrue(done)
             solver_sol = str2grid(solution_set[0])
             self.assertTrue(grid_equal(solution, solver_sol))
@@ -284,7 +284,7 @@ class SudokuTest(unittest.TestCase):
         ]
         for puzzle, solution in puzzles:
             puzzle, solution =list(map(str2grid, [puzzle, solution]))
-            solution_set, done, _ = solveSudoku(puzzle, verbose=False, all_solutions=False)
+            solution_set, done, _ = solve_sudoku(puzzle, verbose=False, all_solutions=False)
             self.assertTrue(done)
             solver_sol = str2grid(solution_set[0])
             self.assertTrue(grid_equal(solution, solver_sol))
@@ -354,7 +354,7 @@ class SudokuTest(unittest.TestCase):
         ]
         for puzzle, solution in puzzles:
             puzzle, solution = str2grid(puzzle), str2grid(solution)
-            solution_set, done, _ = solveSudoku(puzzle, verbose=False, all_solutions=False)
+            solution_set, done, _ = solve_sudoku(puzzle, verbose=False, all_solutions=False)
             self.assertTrue(done)
             solver_sol = str2grid(solution_set[0])
             self.assertTrue(grid_equal(solution, solver_sol))
@@ -373,7 +373,7 @@ class SudokuTest(unittest.TestCase):
         ]
         for puzzle, solution in puzzles:
             puzzle, solution = str2grid(puzzle), str2grid(solution)
-            solution_set, done, info = solveSudoku(puzzle, verbose=False, all_solutions=False, is_X_Sudoku=True)
+            solution_set, done, info = solve_sudoku(puzzle, verbose=False, all_solutions=False, is_X_Sudoku=True)
             self.assertTrue(done)
             solver_sol = str2grid(solution_set[0])
             self.assertTrue(grid_equal(solution, solver_sol))

@@ -118,7 +118,7 @@ def solveSudokuBrute(grid):
     return grid, solved, info
 
 
-def solveSudoku(grid, num_boxes=SIZE, verbose=True, all_solutions=False, is_X_Sudoku=False):
+def solve_sudoku(grid, num_boxes=SIZE, verbose=True, all_solutions=False, is_X_Sudoku=False):
     """
     idea based on https://dev.to/aspittel/how-i-finally-wrote-a-sudoku-solver-177g
     Try each step until failure, and repeat:
@@ -145,7 +145,6 @@ def solveSudoku(grid, num_boxes=SIZE, verbose=True, all_solutions=False, is_X_Su
                         elif len(options) == 1:  # Step 1
                             game.place_and_erase(
                                 i, j, list(options)[0])  # Step 2
-                            # game.flush_candidates() # full grid cleaning
                             edited = True
             if not edited:  # changed nothing in this round -> either done or stuck
                 if solved:
@@ -174,7 +173,7 @@ def solveSudoku(grid, num_boxes=SIZE, verbose=True, all_solutions=False, is_X_Su
                         if solved and not all_solutions:
                             break  # return 1 solution
                         if verbose and progress > progress_update:
-                            print("%.1f" % (progress*100), end='...')
+                            print("%.1f" % (progress*100), end=' ...')
                             progress_update = (
                                 (progress//update_increment) + 1) * update_increment
                     return solved
@@ -189,11 +188,13 @@ def solveSudoku(grid, num_boxes=SIZE, verbose=True, all_solutions=False, is_X_Su
 
     possible, message = game.check_possible()
     if not possible:
-        print('Error on board. %s' % message)
+        if verbose:
+            print('Error on board. %s' % message)
         info = {
             'calls': calls,
             'max depth': depth_max,
             'nsolutions': len(solution_set),
+            'error': message
         }
         return solution_set, False, info
 
@@ -216,7 +217,7 @@ if __name__ == '__main__':
     # from https://www.sudokuwiki.org/Weekly_Sudoku.asp
     # 404 'unsolvable'
     puzzle   = '400009200000010080005400006004200001050030060700005300500007600090060000002800007'
-    #solution = '468579213279613485135428796384296571951734862726185349513947628897362154642851937'
+    solution = '468579213279613485135428796384296571951734862726185349513947628897362154642851937'
     # puzzle[0] = 0  # multiple solutions -> 411 solutions
 
     ## https://theconversation.com/good-at-sudoku-heres-some-youll-never-complete-5234
@@ -240,17 +241,15 @@ if __name__ == '__main__':
         j = ij % 9
         grid[i][j] = 0
 
-    solution = solution if 'solution' in locals() else None
-
-    verbose       = False
-    all_solutions = False
+    verbose       = True
+    all_solutions = True
 
     t0 = time.time()
     print_grid(grid)
     nclues = 81 - puzzle.count('.') - puzzle.count('0')
     print("num clues: %d" % nclues)
     ## solve
-    solution_set, done, info = solveSudoku(
+    solution_set, done, info = solve_sudoku(
         grid, 
         verbose=verbose, 
         all_solutions=all_solutions
@@ -264,7 +263,7 @@ if __name__ == '__main__':
 
     if done:
         solver_grid = str2grid(solution_set[0])
-        if solution:
+        if 'solution' in locals():
             grid_solution = str2grid(solution)  
             print("The solution is correct: ", grid_equal(solver_grid, grid_solution))
         print_grid(solver_grid)

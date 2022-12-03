@@ -6,10 +6,9 @@ Solve many puzzles at once
 
 """
 
-from Sudoku import Sudoku
-from SudokuSolver import Sudoku, solveSudoku, grid_equal, str2grid, grid2str
+from SudokuSolver import solve_sudoku, str2grid
 import time
-from statistics import mean, median, stdev
+from statistics import mean, stdev
 
 def argmax(arr) -> int:
     pair = max(enumerate(arr), key=lambda pair: pair[1])
@@ -19,14 +18,16 @@ def argmax(arr) -> int:
 if __name__ == '__main__':
     folder = 'test/'
 
-    file_name = 'hardest.txt'  # top95.txt hardest.txt # from https://norvig.com/sudoku.html. 
+    file_name = 'top95.txt'  # top95.txt hardest.txt # from https://norvig.com/sudoku.html. 
     #file_name = 'ny.txt'   # from the New York Times
+    #file_name = 'possiblesN.txt' # X-Sudoku https://www.geocaching.com/geocache/GC7MG6K_denombrements
     
     with open(folder + file_name, 'r') as f:
         puzzles = f.read().strip().split('\n')
 
     verbose       = False
     all_solutions = False
+    is_X_Sudoku   = False
 
     t0 = time.time()
     metrics = {
@@ -36,16 +37,19 @@ if __name__ == '__main__':
         'nsolutions': []
     }
     num_solved = 0
+    n_puzzles = len(puzzles)
+    n_update = round(n_puzzles / 100) + 1
     for k, puzzle in enumerate(puzzles):
-        # if k != 86:
-        #     continue
+        if k % n_update == 0:
+            print(f"{k + 1}/{len(puzzles)}")
         tk0 = time.time()
         ## solve
         puzzle = str2grid(puzzle)
-        my_solution, done, info = solveSudoku(
+        my_solution, done, info = solve_sudoku(
             puzzle, 
             verbose=verbose, 
-            all_solutions=all_solutions
+            all_solutions=all_solutions,
+            is_X_Sudoku=is_X_Sudoku,
             )
         # my_solution, done, info = solveSudokuBrute(puzzle)
         deltaTk = time.time() - tk0
@@ -68,7 +72,8 @@ if __name__ == '__main__':
     metric = metrics['max depths']
     print("max depth min-max, mean: %d-%d, %.2f %s %.2f "%(min(metric), max(metric), mean(metric), pm, stdev(metric)))
     metric = metrics['nsolutions']
-    print("mnsolutions min-max, mean: %d-%d, %.1f %s %.1f "%(min(metric), max(metric), mean(metric), pm, stdev(metric)))
+    print("nsolutions min-max, mean: %d-%d, %.1f %s %.1f "%(min(metric), max(metric), mean(metric), pm, stdev(metric)))
+    print("total solutions: %d" % (sum(metric)))
 
     print(' ')
     metric = metrics['calls']
