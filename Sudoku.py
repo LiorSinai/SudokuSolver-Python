@@ -188,24 +188,24 @@ class Sudoku():
             for k, inds in enumerate(inds_set):
                 arr = [self.grid[i][j] for i, j in inds]
                 if not Sudoku.no_duplicates(arr):
-                    return False, 'Duplicate values in %s %d' % (type_[t], k)
+                    raise SudokuException('Duplicate values in %s %d' % (type_[t], k))
                 arr += list(self.get_candidates(inds))
                 possible, missing_num = Sudoku.all_exist(arr)
                 if not possible:
-                    return False, '%d not placeable in %s %d' % (missing_num, type_[t], k)
+                    raise SudokuException('%d not placeable in %s %d' % (missing_num, type_[t], k))
         # check boxes
         for i0 in range(0, self.n, BOX_SIZE):
             for j0 in range(0, self.n, BOX_SIZE):
                 arr = self.get_box(i0, j0)[:]
                 if not Sudoku.no_duplicates(arr):
-                    return False, 'Duplicate values in box (%d, %d)' % (i0, j0)
+                    raise SudokuException('Duplicate values in box (%d, %d)' % (i0, j0))
                 for i in range(i0, i0 + BOX_SIZE):
                     for j in range(j0, j0 + BOX_SIZE):
                         arr += list(self.candidates[i][j])
                 possible, missing_num = Sudoku.all_exist(arr)
                 if not possible:
-                    return False, '%d not placeable in box (%d, %d)' % (missing_num, i0, j0)
-        return True, ""
+                    raise SudokuException('%d not placeable in box (%d, %d)' % (missing_num, i0, j0))
+        return True
 
     ## ------- Candidate functions -------- ##
     def place_and_erase(self, r: int, c: int, x: int, constraint_prop=True):
@@ -388,3 +388,6 @@ class Sudoku():
                 # keeps = self.box_line_reduction(inds)
                 # for inds_keep, nums in keeps:
                 #     self.erase(nums, inds, inds_keep)
+                    
+class SudokuException(Exception):
+    pass

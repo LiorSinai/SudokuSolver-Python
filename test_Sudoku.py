@@ -6,7 +6,7 @@ Sudoku Solver
 
 """
 
-from Sudoku import Sudoku
+from Sudoku import Sudoku, SudokuException
 from solver import grid_equal
 from str2grid import str2grid
 import unittest
@@ -234,7 +234,7 @@ class SudokuTest(unittest.TestCase):
             puzzle = str2grid(puzzle)
             s = Sudoku(puzzle)
             s.flush_candidates()
-            self.assertFalse(s.check_possible()[0])
+            self.assertRaises(SudokuException, s.check_possible)
         # possible
         puzzles = [
             '280070309600104007745080006064830100102009800000201930006050701508090020070402050',  
@@ -245,7 +245,7 @@ class SudokuTest(unittest.TestCase):
             puzzle = str2grid(puzzle)
             s = Sudoku(puzzle)
             s.flush_candidates()
-            self.assertTrue(s.check_possible()[0])
+            self.assertTrue(s.check_possible())
 
     def impossible_x_test(self):
         # impossible
@@ -259,11 +259,11 @@ class SudokuTest(unittest.TestCase):
             puzzle = str2grid(puzzle)
             s = Sudoku(puzzle, is_X_Sudoku=False)
             s.flush_candidates()
-            self.assertTrue(s.check_possible()[0])
+            self.assertTrue(s.check_possible())
             # now try with X-Sudoku rules:
             s = Sudoku(puzzle, is_X_Sudoku=True)
             s.flush_candidates()
-            self.assertFalse(s.check_possible()[0])
+            self.assertRaises(SudokuException, s.check_possible)
         # possible
         puzzles = [
             '030040200520006700000000000080020170000070000050000003400000032000600000000080691',  
@@ -273,7 +273,7 @@ class SudokuTest(unittest.TestCase):
             puzzle = str2grid(puzzle)
             s = Sudoku(puzzle)
             s.flush_candidates()
-            self.assertTrue(s.check_possible()[0])
+            self.assertTrue(s.check_possible())
 
 
 def suite():

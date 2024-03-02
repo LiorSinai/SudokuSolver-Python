@@ -155,17 +155,7 @@ def solve_sudoku(grid: List[List[int]], verbose=True, all_solutions=False, **kwa
     game = Sudoku(grid, **kwargs)
     game.flush_candidates()  # check for obvious candidates
 
-    possible, message = game.check_possible()
-    if not possible:
-        if verbose:
-            print('Error on board. %s' % message)
-        info = {
-            'calls': calls,
-            'max depth': depth_max,
-            'nsolutions': 0,
-            'error': message
-        }
-        return solution_set, False, info
+    game.check_possible()
 
     if verbose:
         print("solving: ", end='')
