@@ -78,10 +78,10 @@ class Sudoku():
         self.groups['diagonal 1'] = diag_top_right_to_bottom_left
 
     def create_hyper_boxes(self):
-        self.groups['box 1'] = [(i, j) for i in [1, 2, 3] for j in [1, 2, 3]]
-        self.groups['box 2'] = [(i, j) for i in [1, 2, 3] for j in [5, 6, 7]]
-        self.groups['box 3'] = [(i, j) for i in [5, 6, 7] for j in [1, 2, 3]]
-        self.groups['box 4'] = [(i, j) for i in [5, 6, 7] for j in [5, 6, 7]]
+        self.groups['hyper-box (1,1)'] = [(i, j) for i in [1, 2, 3] for j in [1, 2, 3]]
+        self.groups['hyper-box (1,5)'] = [(i, j) for i in [1, 2, 3] for j in [5, 6, 7]]
+        self.groups['hyper-box (5,1)'] = [(i, j) for i in [5, 6, 7] for j in [1, 2, 3]]
+        self.groups['hyper-box (5,5)'] = [(i, j) for i in [5, 6, 7] for j in [5, 6, 7]]
 
     def create_cross(self):
         cross = {
