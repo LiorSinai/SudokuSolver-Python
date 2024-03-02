@@ -7,7 +7,8 @@ Sudoku Solver
 """
 
 from Sudoku import Sudoku
-from solver import grid_equal, str2grid
+from solver import grid_equal
+from str2grid import str2grid
 import unittest
 
 
