@@ -6,7 +6,7 @@ Solve many puzzles at once
 
 """
 
-from SudokuSolver import solve_sudoku, str2grid
+from solver import solve_sudoku, str2grid
 import time
 from statistics import mean, stdev
 
@@ -42,9 +42,9 @@ if __name__ == '__main__':
     for k, puzzle in enumerate(puzzles):
         if k % n_update == 0:
             print(f"{k + 1}/{len(puzzles)}")
+        puzzle = str2grid(puzzle)
         tk0 = time.time()
         ## solve
-        puzzle = str2grid(puzzle)
         my_solution, done, info = solve_sudoku(
             puzzle, 
             verbose=verbose, 
