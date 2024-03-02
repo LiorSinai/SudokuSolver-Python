@@ -18,25 +18,26 @@ class Sudoku():
         assert len(grid[0]) == n, "Grid is not square. n_rows=%d, n_columns=%d" % (n, len(grid[0]))
         self.grid = grid
         self.n = n
-        self.special = []
+        self.groups = dict()
+        self.create_rows_and_columns(n)
+        self.create_boxes(n)
         if is_X_Sudoku:
-            diag_top_left_to_bottom_right = {(i, i) for i in range(n)}
-            diag_top_right_to_bottom_left = {(i, n - i - 1) for i in range(n)}
-            self.special.append(diag_top_left_to_bottom_right)
-            self.special.append(diag_top_right_to_bottom_left)
+            self.create_diagonals(n)
         if is_hyper_Sudoku:
-            box_1 = {(i, j) for i in [1, 2, 3] for j in [1, 2, 3]}
-            box_2 = {(i, j) for i in [1, 2, 3] for j in [5, 6, 7]}
-            box_3 = {(i, j) for i in [5, 6, 7] for j in [1, 2, 3]}
-            box_4 = {(i, j) for i in [5, 6, 7] for j in [5, 6, 7]}
-            self.special.extend([box_1, box_2, box_3, box_4])
+            self.create_hyper_boxes()
         if is_cross_Sudoku:
-            cross = {
-                (2, 4), (3, 4), (4, 4), (5, 4), (6, 4),
-                (4, 2), (4, 3), (4, 5), (4, 6)
-            }
-            self.special.append(cross)
-        # create a grid of viable candidates for each position
+            self.create_cross()
+        # create reverse maps to groups
+        self.cells = []
+        for i in range(n):
+            row = []
+            for j in range(n):
+                cell = []
+                for g in self.groups.values():
+                    if (i, j) in g:
+                        cell.append(g)
+                row.append(cell)
+            self.cells.append(row)
         candidates = []
         for i in range(n):
             row = []
@@ -54,48 +55,64 @@ class Sudoku():
             repr += str(row) + '\n'
         return repr
 
-    def get_row(self, r: int) -> List[int]:
-        return self.grid[r]
+    def create_rows_and_columns(self, n):
+        for c in range(n):
+            row = [(c, j) for j in range(n)]
+            col = [(i, c) for i in range(n)]
+            self.groups[f'row {c}'] = row
+            self.groups[f'column {c}'] = col
 
-    def get_col(self, c: int) -> List[int]:
-        return [row[c] for row in self.grid]
+    def create_boxes(self, n):
+        for i0 in range(0, n, BOX_SIZE):
+            for j0 in range(0, n, BOX_SIZE):
+                box = []
+                for i in range(i0, i0 + BOX_SIZE):
+                    for j in range(j0, j0 + BOX_SIZE):
+                        box.append((i, j))
+                self.groups[f'box ({i0},{j0})'] = box
+        
+    def create_diagonals(self, n):
+        diag_top_left_to_bottom_right = [(i, i) for i in range(n)]
+        diag_top_right_to_bottom_left = [(i, n - i - 1) for i in range(n)]
+        self.groups['diagonal 0'] = diag_top_left_to_bottom_right
+        self.groups['diagonal 1'] = diag_top_right_to_bottom_left
 
+    def create_hyper_boxes(self):
+        self.groups['box 1'] = [(i, j) for i in [1, 2, 3] for j in [1, 2, 3]]
+        self.groups['box 2'] = [(i, j) for i in [1, 2, 3] for j in [5, 6, 7]]
+        self.groups['box 3'] = [(i, j) for i in [5, 6, 7] for j in [1, 2, 3]]
+        self.groups['box 4'] = [(i, j) for i in [5, 6, 7] for j in [5, 6, 7]]
+
+    def create_cross(self):
+        cross = {
+            (2, 4), (3, 4), (4, 4), (5, 4), (6, 4),
+            (4, 2), (4, 3), (4, 5), (4, 6)
+        }
+        self.groups['cross'] = cross
+        # create a grid of viable candidates for each position
+
+
+    def get_values(self, group: str):
+        values = [self.grid[i][j] for (i, j) in self.groups[group]]
+        return values
+    
     def get_box_inds(self, r: int, c: int) -> List[Tuple[int, int]]:
-        inds_box = []
         i0 = (r // BOX_SIZE) * BOX_SIZE  # get first row index
         j0 = (c // BOX_SIZE) * BOX_SIZE  # get first column index
-        for i in range(i0, i0 + BOX_SIZE):
-            for j in range(j0, j0 + BOX_SIZE):
-                inds_box.append((i, j))
+        inds_box = self.groups[f'box ({i0},{j0})']
         return inds_box
 
-    def get_box(self, r: int, c: int) -> List[int]:
-        box = []
-        for i, j in self.get_box_inds(r, c):
-            box.append(self.grid[i][j])
-        return box
-
     def get_neighbour_inds(self, r: int, c: int, flatten=False):
-        inds_row = [(r, j) for j in range(self.n)]
-        inds_col = [(i, c) for i in range(self.n)]
-        inds_box = self.get_box_inds(r, c)
-        neighbours = [inds_row, inds_col, inds_box]
-        for inds in self.special:
-            if (r, c) in inds:
-                neighbours.append(list(inds))
+        neighbours = self.cells[r][c]
         if flatten:
             return list(set().union(*neighbours))
         return neighbours
 
     def find_options(self, r: int, c: int) -> Set:
         nums = set(range(1, SIZE + 1))
-        set_row = set(self.get_row(r))
-        set_col = set(self.get_col(c))
-        set_box = set(self.get_box(r, c))
-        used = set_row | set_col | set_box
-        for s in self.special:
-            if (r, c) in s:
-                used |= set([self.grid[i][j] for (i, j) in s])
+        used = set()
+        for group in self.cells[r][c]:
+            used |= set([self.grid[i][j] for (i, j) in group])
         valid = nums.difference(used)
         return valid
 
@@ -138,18 +155,9 @@ class Sudoku():
     def check_done(self) -> bool:
         """ check if each row/column/box only has unique elements"""
         # check rows
-        for i in range(self.n):
-            if not Sudoku.all_unique(self.get_row(i)):
+        for key in self.groups:
+            if not Sudoku.all_unique(self.get_values(key)):
                 return False
-        # check columns
-        for j in range(self.n):
-            if not Sudoku.all_unique(self.get_col(j)):
-                return False
-        # check boxes
-        for i0 in range(0, self.n, BOX_SIZE):
-            for j0 in range(0, self.n, BOX_SIZE):
-                if not Sudoku.all_unique(self.get_box(i0, j0)):
-                    return False
         return True
     
     def get_candidates(self, indices: List[Tuple[int, int]]):
@@ -158,7 +166,6 @@ class Sudoku():
         for (i, j) in indices:
                 candidates = candidates | self.candidates[i][j]
         return candidates
-    
     
     def get_candidates_box(self, start: Tuple[int, int], end: Tuple[int, int]):
         " get candidates within two corners of a rectangle/column/row"
@@ -171,40 +178,14 @@ class Sudoku():
     def check_possible(self):
         """ check if each row/column/box can have all unique elements"""
         # get rows
-        rows = []
-        for i in range(self.n):
-            inds = [(i, j) for j in range(self.n)]
-            rows.append(inds)
-        # get columns
-        cols = []
-        for j in range(self.n):
-            inds = [(i, j) for i in range(self.n)]
-            cols.append(inds)
-        # get specials
-        specials = [list(s) for s in self.special]
-        # check rows, columns and diagonals
-        type_ = ['row', 'column', 'special']
-        for t, inds_set in enumerate([rows, cols, specials]):
-            for k, inds in enumerate(inds_set):
-                arr = [self.grid[i][j] for i, j in inds]
-                if not Sudoku.no_duplicates(arr):
-                    raise SudokuException('Duplicate values in %s %d' % (type_[t], k))
-                arr += list(self.get_candidates(inds))
-                possible, missing_num = Sudoku.all_exist(arr)
-                if not possible:
-                    raise SudokuException('%d not placeable in %s %d' % (missing_num, type_[t], k))
-        # check boxes
-        for i0 in range(0, self.n, BOX_SIZE):
-            for j0 in range(0, self.n, BOX_SIZE):
-                arr = self.get_box(i0, j0)[:]
-                if not Sudoku.no_duplicates(arr):
-                    raise SudokuException('Duplicate values in box (%d, %d)' % (i0, j0))
-                for i in range(i0, i0 + BOX_SIZE):
-                    for j in range(j0, j0 + BOX_SIZE):
-                        arr += list(self.candidates[i][j])
-                possible, missing_num = Sudoku.all_exist(arr)
-                if not possible:
-                    raise SudokuException('%d not placeable in box (%d, %d)' % (missing_num, i0, j0))
+        for key, inds in self.groups.items():
+            arr = [self.grid[i][j] for (i, j) in inds]
+            if not Sudoku.no_duplicates(arr):
+                raise SudokuException('Duplicate values in %s' % (key))
+            arr += list(self.get_candidates(inds))
+            possible, missing_num = Sudoku.all_exist(arr)
+            if not possible:
+                raise SudokuException('%d not placeable in %s' % (missing_num, key))
         return True
 
     ## ------- Candidate functions -------- ##
@@ -345,41 +326,19 @@ class Sudoku():
                     ([(i, j) for i in range(i0, i1 + 1)], list(uniques)))
         return keeps
 
-    def get_all_units(self):
-        # get indices for each set
-        inds_set = []
-        for i in range(self.n):
-            inds = [(i, j) for j in range(self.n)]
-            inds_set.append(inds)
-        # check in column
-        for j in range(self.n):
-            inds = [(i, j) for i in range(self.n)]
-            inds_set.append(inds)
-        return inds_set
-
-    def get_all_boxes(self):
-        inds_box = []
-        for i0 in range(0, self.n, BOX_SIZE):
-            for j0 in range(0, self.n, BOX_SIZE):
-                inds = self.get_box_inds(i0, j0)
-                inds_box.append(inds)
-        return inds_box
-
     def flush_candidates(self) -> None:
         """set candidates across the whole grid, according to logical strategies"""
         # get indices for each set
-        inds_box = self.get_all_boxes()
-        inds_set = self.get_all_units()
-        inds_set.extend(inds_box)
         for _ in range(1):  # repeat this process in case changes are made
             # apply strategies
-            for inds in inds_set:
+            for inds in self.groups.values():
                 # hidden/naked singles/pairs/triples
                 uniques = self.get_unique(inds, type=[1, 2])
                 for inds_combo, combo in uniques:
                     self.erase(combo, inds, inds_combo)
                     self.set_candidates(combo, inds_combo)
-            for inds in inds_box:
+            inds_boxes = [(inds) for (key, inds) in self.groups.items() if key.startswith('box')]
+            for inds in inds_boxes:
                 # pointing pairs
                 pointers = self.pointing_combos(inds)
                 for line, inds_pointer, num in pointers:
