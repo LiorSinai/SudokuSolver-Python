@@ -13,7 +13,7 @@ BOX_SIZE = 3
 
 
 class Sudoku():
-    def __init__(self, grid: List, is_X_Sudoku=False):
+    def __init__(self, grid: List[List[int]], is_X_Sudoku=False):
         n = len(grid)
         #assert len(grid[0]) == n, "Grid is not square. n_rows=%d, n_columns=%d" % (n, len(grid[0]))
         self.grid = grid
@@ -60,10 +60,10 @@ class Sudoku():
 
     def get_diagonals(self, r: int, c: int):
         diag = []
-        if r==c:
+        if r == c:
             for i in range(self.n):
                 diag.append(self.grid[i][i])
-        if r==(self.n - c - 1):
+        if r == (self.n - c - 1):
             for i in range(self.n):
                     diag.append(self.grid[i][self.n - i - 1])
         return diag
@@ -76,7 +76,7 @@ class Sudoku():
         if self.is_X_Sudoku:
             if r == c:
                 inds_diag.extend([(i, i) for i in range(self.n)])
-            if r== (self.n - c - 1):
+            if r == (self.n - c - 1):
                 inds_diag.extend([(i, self.n - i - 1) for i in range(self.n)])
         if flatten:
             return list(set(inds_row + inds_col + inds_box + inds_diag ))
@@ -92,56 +92,60 @@ class Sudoku():
         valid = nums.difference(used)
         return valid
 
-    def counting(self, arr: List[int], m=SIZE) -> List[int]:
-        """ count occurances in an array """
+    @staticmethod
+    def counting(arr: List[int], m=SIZE) -> List[int]:
+        """ count occurrences in an array """
         count = [0] * (m + 1)
         for x in arr:
             count[x] += 1
         return count
 
-    def all_unique(self, arr: List[int], m=SIZE) -> bool:
+    @staticmethod
+    def all_unique(arr: List[int], m=SIZE) -> bool:
         """ verify that all numbers are used, and at most once """
-        count = self.counting(arr, m=m)
+        count = Sudoku.counting(arr, m=m)
         for c in count[1:]:  # ignore 0
             if c != 1:
                 return False # not unique
         return True
 
-    def no_duplicates(self, arr):
+    @staticmethod
+    def no_duplicates(arr: List[int]):
         """ verify that no number is used more than once """
-        count = self.counting(arr)
+        count = Sudoku.counting(arr)
         for c in count[1:]:  # exclude 0:
             if c > 1:
                 return False  # more than 1 of value
         return True
 
-    def all_exist(self, arr):
+    @staticmethod
+    def all_exist(arr: List[int]):
         """ verify that there is at least one of each number present """
-        count = self.counting(arr)
+        count = Sudoku.counting(arr)
         missing = None
         for num, c in enumerate(count[1:]):  # exclude 0:
             if c == 0:
                 return False, num+1  # no value or candidate exists
         return True, missing
 
-    def check_done(self, num_boxes=SIZE) -> bool:
+    def check_done(self) -> bool:
         """ check if each row/column/box only has unique elements"""
         # check rows
         for i in range(self.n):
-            if not self.all_unique(self.get_row(i)):
+            if not Sudoku.all_unique(self.get_row(i)):
                 return False
         # check columns
         for j in range(self.n):
-            if not self.all_unique(self.get_col(j)):
+            if not Sudoku.all_unique(self.get_col(j)):
                 return False
         # check boxes
         for i0 in range(0, self.n, BOX_SIZE):
             for j0 in range(0, self.n, BOX_SIZE):
-                if not self.all_unique(self.get_box(i0, j0)):
+                if not Sudoku.all_unique(self.get_box(i0, j0)):
                     return False
         return True
 
-    def get_candidates(self, start, end):
+    def get_candidates(self, start: Tuple[int, int], end: Tuple[int, int]):
         " get candidates within two corners of a rectangle/column/row"
         candidates = set()
         for i in range(start[0], end[0] + 1):
@@ -171,22 +175,22 @@ class Sudoku():
         for t, inds_set in enumerate([rows_set, cols_set]):
             for k, inds in enumerate(inds_set):
                 arr = [self.grid[i][j] for i, j in inds]
-                if not self.no_duplicates(arr):
+                if not Sudoku.no_duplicates(arr):
                     return False, 'Duplicate values in %s %d' % (type_[t], k)
                 arr += list(self.get_candidates(inds[0], inds[-1]))
-                possible, missing_num = self.all_exist(arr)
+                possible, missing_num = Sudoku.all_exist(arr)
                 if not possible:
                     return False, '%d not placeable in %s %d' % (missing_num, type_[t], k)
         # check boxes
         for i0 in range(0, self.n, BOX_SIZE):
             for j0 in range(0, self.n, BOX_SIZE):
                 arr = self.get_box(i0, j0)[:]
-                if not self.no_duplicates(arr):
+                if not Sudoku.no_duplicates(arr):
                     return False, 'Duplicate values in box (%d, %d)' % (i0, j0)
                 for i in range(i0, i0 + BOX_SIZE):
                     for j in range(j0, j0 + BOX_SIZE):
                         arr += list(self.candidates[i][j])
-                possible, missing_num = self.all_exist(arr)
+                possible, missing_num = Sudoku.all_exist(arr)
                 if not possible:
                     return False, '%d not placeable in box (%d, %d)' % (missing_num, i0, j0)
         return True, ""
@@ -197,7 +201,7 @@ class Sudoku():
         # place candidate x
         self.grid[r][c] = x
         self.candidates[r][c] = set()
-        # remove candidate  x in neighbours
+        # remove candidate x in neighbours
         inds_neighbours = self.get_neighbour_inds(r, c, flatten=True)
         erased = [(r, c)]  # set of indices for constraint propogration
         erased += self.erase([x], inds_neighbours, [])
@@ -219,7 +223,7 @@ class Sudoku():
         # for inds_keep, nums in keeps:
         #     self.erase(nums, inds_box, inds_keep)
 
-    def erase(self, nums, indices, keep):
+    def erase(self, nums: List[int], indices: List[Tuple[int, int]], keep: List[Tuple[int, int]]):
         """ erase nums as candidates in indices, but not in keep"""
         erased = []
         for i, j in indices:
@@ -234,7 +238,7 @@ class Sudoku():
                 erased.append((i, j))
         return erased
 
-    def set_candidates(self, nums, indices):
+    def set_candidates(self, nums: List[int], indices: List[Tuple[int, int]]):
         """set candidates at indices. Remove all other candidates"""
         erased = []
         for i, j in indices:
@@ -245,7 +249,7 @@ class Sudoku():
                 erased.append((i, j))  # made changes here
         return erased
 
-    def count_candidates(self, indices):
+    def count_candidates(self, indices: List[Tuple[int, int]]):
         count = [[] for _ in range(self.n + 1)]
         # get counts
         for i, j in indices:
@@ -253,7 +257,7 @@ class Sudoku():
                 count[num].append((i, j))
         return count
 
-    def get_unique(self, indices, type=(0, 1, 2)):
+    def get_unique(self, indices: List[Tuple[int, int]], type=(0, 1, 2)):
         # See documentation at https://www.sudokuwiki.org/Hidden_Candidates
         groups = self.count_candidates(indices)
         uniques = []  # final set of unique candidates to return

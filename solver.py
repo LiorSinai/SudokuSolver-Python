@@ -14,7 +14,7 @@ import time
 from Sudoku import Sudoku, SIZE
 
 
-def grid_equal(A, B):
+def grid_equal(A: List[List[int]], B: List[List[int]]):
     """ Check if 2 grids are equal or not"""
     n = len(A)
     if n != len(B):
@@ -25,7 +25,8 @@ def grid_equal(A, B):
                 return False
     return True
 
-def get_nonempty(A):
+
+def get_nonempty(A: List[List[int]]):
     n = len(A)
     m = len(A[0])
     nonempty = []
@@ -36,11 +37,13 @@ def get_nonempty(A):
             nonempty.append(nm)
     return nonempty
 
-def flatten(grid):
+
+def flatten(grid: List[List[int]]):
     arr = []
     for row in grid:
         arr.extend(row)
     return arr
+
 
 def unflatten(arr: List[int], n=9):
     grid = []
@@ -48,13 +51,15 @@ def unflatten(arr: List[int], n=9):
         grid.append(arr[i:i+n])
     return grid
 
-def arr2str(arr):
+
+def arr2str(arr: List[int]):
     string = ''
     for digit in arr:
         string += str(digit)
     return string
 
-def str2arr(string):
+
+def str2arr(string: str):
     arr = []
     end = string.find('-')
     end = len(string) if end == -1 else end
@@ -65,11 +70,14 @@ def str2arr(string):
             arr.append(int(c))
     return arr  # [int(c) for c in string]
 
+
 def grid2str(grid: List[List[int]]) -> str:
     return arr2str(flatten(grid))
 
+
 def str2grid(string: str) -> List[List[int]]:
     return unflatten(str2arr(string))
+
 
 def print_grid(grid: List[List[int]]) -> None:
         repr = ''
@@ -77,7 +85,8 @@ def print_grid(grid: List[List[int]]) -> None:
             repr += str(row) + '\n'
         print(repr[:-1])
 
-def solveSudokuBrute(grid):
+
+def solve_sudoku_brute(grid: List[List[int]]):
     """
     Only uses backtracking. Very slow, especially on hard puzzles
     """
@@ -118,7 +127,7 @@ def solveSudokuBrute(grid):
     return grid, solved, info
 
 
-def solve_sudoku(grid, num_boxes=SIZE, verbose=True, all_solutions=False, is_X_Sudoku=False):
+def solve_sudoku(grid: List[List[int]], verbose=True, all_solutions=False, is_X_Sudoku=False):
     """
     idea based on https://dev.to/aspittel/how-i-finally-wrote-a-sudoku-solver-177g
     Try each step until failure, and repeat:
@@ -126,7 +135,7 @@ def solve_sudoku(grid, num_boxes=SIZE, verbose=True, all_solutions=False, is_X_S
     2) write candidates with only 1 option/ 2 pairs
     3) with multiple options, take a guess and branch (backtrack)
     """
-    def solve(game, depth=0, progress_factor=1):
+    def solve(game: Sudoku, depth=0, progress_factor=1.0):
         nonlocal calls, depth_max, progress, progress_update, update_increment
         calls += 1
         depth_max = max(depth, depth_max)
@@ -193,7 +202,7 @@ def solve_sudoku(grid, num_boxes=SIZE, verbose=True, all_solutions=False, is_X_S
         info = {
             'calls': calls,
             'max depth': depth_max,
-            'nsolutions': len(solution_set),
+            'nsolutions': 0,
             'error': message
         }
         return solution_set, False, info
