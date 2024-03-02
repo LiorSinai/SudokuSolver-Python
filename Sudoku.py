@@ -13,7 +13,7 @@ BOX_SIZE = 3
 
 
 class Sudoku():
-    def __init__(self, grid: List[List[int]], is_X_Sudoku=False):
+    def __init__(self, grid: List[List[int]], is_X_Sudoku=False, is_hyper_Sudoku=False, is_cross_Sudoku=False):
         n = len(grid)
         assert len(grid[0]) == n, "Grid is not square. n_rows=%d, n_columns=%d" % (n, len(grid[0]))
         self.grid = grid
@@ -24,6 +24,18 @@ class Sudoku():
             diag_top_right_to_bottom_left = {(i, n - i - 1) for i in range(n)}
             self.special.append(diag_top_left_to_bottom_right)
             self.special.append(diag_top_right_to_bottom_left)
+        if is_hyper_Sudoku:
+            box_1 = {(i, j) for i in [1, 2, 3] for j in [1, 2, 3]}
+            box_2 = {(i, j) for i in [1, 2, 3] for j in [5, 6, 7]}
+            box_3 = {(i, j) for i in [5, 6, 7] for j in [1, 2, 3]}
+            box_4 = {(i, j) for i in [5, 6, 7] for j in [5, 6, 7]}
+            self.special.extend([box_1, box_2, box_3, box_4])
+        if is_cross_Sudoku:
+            cross = {
+                (2, 4), (3, 4), (4, 4), (5, 4), (6, 4),
+                (4, 2), (4, 3), (4, 5), (4, 6)
+            }
+            self.special.append(cross)
         # create a grid of viable candidates for each position
         candidates = []
         for i in range(n):

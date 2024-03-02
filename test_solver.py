@@ -136,6 +136,46 @@ class SudokuSolverTest(unittest.TestCase):
             self.assertTrue(grid_equal(solution, solver_sol))
 
 
+    def solve_hyper_sudoku(self):
+        puzzles = [
+            # 711 solutions in general, 1 with hyper Sudoku
+            (
+                '...8..4..7.........4..9.........18....9....72....8..3931.....6...83542....7.1....',
+                '951876423783542691246193758572931846839465172164287539315728964698354217427619385'
+            ),
+            (
+            '.3.67.....5....98...4...7.3.........14...2.....38.1....6.....9..1.....5...9.3...4',
+            '831679542756324981924185763678943125145762839293851476462518397317496258589237614'
+            ),
+            # 6836 solutions in general, 1 with hyper Sudoku
+        ]
+        for puzzle, solution in puzzles:
+            puzzle, solution = str2grid(puzzle), str2grid(solution)
+            solution_set, done, info = solve_sudoku(puzzle, verbose=False, all_solutions=False, is_hyper_Sudoku=True)
+            self.assertTrue(done)
+            solver_sol = str2grid(solution_set[0])
+            self.assertTrue(grid_equal(solution, solver_sol))
+
+    def solve_hyper_sudoku_x(self):
+        puzzles = [
+            # From Hyper Sudoku X: 100 Hard Puzzles by Peter Ritmeester 
+            # Many solutions in general, 747 X Sudoku solutions, 76 hyper Sudoku solutions, 1 Hyper X solution
+            (
+            '..4.............3....6.4.8..1......5..2.6....3.....87...9........5...........2...',
+            '854329761627581934193674582918437625572968413346215879239756148785143296461892357'
+            ),
+        ]
+        for puzzle, solution in puzzles:
+            puzzle, solution = str2grid(puzzle), str2grid(solution)
+            solution_set, done, info = solve_sudoku(
+                puzzle, verbose=False, all_solutions=True, 
+                is_hyper_Sudoku=True, is_X_Sudoku=True)
+            self.assertTrue(done)
+            self.assertEqual(len(solution_set), 1)
+            solver_sol = str2grid(solution_set[0])
+            self.assertTrue(grid_equal(solution, solver_sol))
+
+
 def suite():
     "Set order of tests in ascending order of complexity and code required"
     suite = unittest.TestSuite()
@@ -143,6 +183,8 @@ def suite():
     suite.addTest(SudokuSolverTest('check_solver'))
     suite.addTest(SudokuSolverTest('check_solved_puzzles'))
     suite.addTest(SudokuSolverTest('solve_X_sudoku'))
+    suite.addTest(SudokuSolverTest('solve_hyper_sudoku'))
+    suite.addTest(SudokuSolverTest('solve_hyper_sudoku_x'))
     return suite
 
 
