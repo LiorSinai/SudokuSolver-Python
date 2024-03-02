@@ -15,10 +15,15 @@ BOX_SIZE = 3
 class Sudoku():
     def __init__(self, grid: List[List[int]], is_X_Sudoku=False):
         n = len(grid)
-        #assert len(grid[0]) == n, "Grid is not square. n_rows=%d, n_columns=%d" % (n, len(grid[0]))
+        assert len(grid[0]) == n, "Grid is not square. n_rows=%d, n_columns=%d" % (n, len(grid[0]))
         self.grid = grid
         self.n = n
-        self.is_X_Sudoku = is_X_Sudoku
+        self.special = []
+        if is_X_Sudoku:
+            diag_top_left_to_bottom_right = {(i, i) for i in range(n)}
+            diag_top_right_to_bottom_left = {(i, n - i - 1) for i in range(n)}
+            self.special.append(diag_top_left_to_bottom_right)
+            self.special.append(diag_top_right_to_bottom_left)
         # create a grid of viable candidates for each position
         candidates = []
         for i in range(n):
@@ -58,37 +63,27 @@ class Sudoku():
             box.append(self.grid[i][j])
         return box
 
-    def get_diagonals(self, r: int, c: int):
-        diag = []
-        if r == c:
-            for i in range(self.n):
-                diag.append(self.grid[i][i])
-        if r == (self.n - c - 1):
-            for i in range(self.n):
-                    diag.append(self.grid[i][self.n - i - 1])
-        return diag
-
     def get_neighbour_inds(self, r: int, c: int, flatten=False):
         inds_row = [(r, j) for j in range(self.n)]
         inds_col = [(i, c) for i in range(self.n)]
         inds_box = self.get_box_inds(r, c)
-        inds_diag = []
-        if self.is_X_Sudoku:
-            if r == c:
-                inds_diag.extend([(i, i) for i in range(self.n)])
-            if r == (self.n - c - 1):
-                inds_diag.extend([(i, self.n - i - 1) for i in range(self.n)])
+        neighbours = [inds_row, inds_col, inds_box]
+        for inds in self.special:
+            if (r, c) in inds:
+                neighbours.append(list(inds))
         if flatten:
-            return list(set(inds_row + inds_col + inds_box + inds_diag ))
-        return [inds_row, inds_col, inds_box, inds_diag]
+            return list(set().union(*neighbours))
+        return neighbours
 
     def find_options(self, r: int, c: int) -> Set:
         nums = set(range(1, SIZE + 1))
         set_row = set(self.get_row(r))
         set_col = set(self.get_col(c))
         set_box = set(self.get_box(r, c))
-        set_diagonals = set(self.get_diagonals(r, c)) if self.is_X_Sudoku else set()
-        used = set_row | set_col | set_box | set_diagonals
+        used = set_row | set_col | set_box
+        for s in self.special:
+            if (r, c) in s:
+                used |= set([self.grid[i][j] for (i, j) in s])
         valid = nums.difference(used)
         return valid
 
@@ -144,8 +139,16 @@ class Sudoku():
                 if not Sudoku.all_unique(self.get_box(i0, j0)):
                     return False
         return True
-
-    def get_candidates(self, start: Tuple[int, int], end: Tuple[int, int]):
+    
+    def get_candidates(self, indices: List[Tuple[int, int]]):
+        " get candidates within two corners of a rectangle/column/row"
+        candidates = set()
+        for (i, j) in indices:
+                candidates = candidates | self.candidates[i][j]
+        return candidates
+    
+    
+    def get_candidates_box(self, start: Tuple[int, int], end: Tuple[int, int]):
         " get candidates within two corners of a rectangle/column/row"
         candidates = set()
         for i in range(start[0], end[0] + 1):
@@ -156,28 +159,25 @@ class Sudoku():
     def check_possible(self):
         """ check if each row/column/box can have all unique elements"""
         # get rows
-        rows_set = []
+        rows = []
         for i in range(self.n):
             inds = [(i, j) for j in range(self.n)]
-            rows_set.append(inds)
+            rows.append(inds)
         # get columns
-        cols_set = []
+        cols = []
         for j in range(self.n):
             inds = [(i, j) for i in range(self.n)]
-            cols_set.append(inds)
-        # get diagonals
-        diags_set = []
-        if self.is_X_Sudoku:
-            diags_set.append(self.get_diagonals(0, 0))
-            diags_set.append(self.get_diagonals(0, self.n-1))
+            cols.append(inds)
+        # get specials
+        specials = [list(s) for s in self.special]
         # check rows, columns and diagonals
-        type_ = ['row', 'column', 'diagonal']
-        for t, inds_set in enumerate([rows_set, cols_set]):
+        type_ = ['row', 'column', 'special']
+        for t, inds_set in enumerate([rows, cols, specials]):
             for k, inds in enumerate(inds_set):
                 arr = [self.grid[i][j] for i, j in inds]
                 if not Sudoku.no_duplicates(arr):
                     return False, 'Duplicate values in %s %d' % (type_[t], k)
-                arr += list(self.get_candidates(inds[0], inds[-1]))
+                arr += list(self.get_candidates(inds))
                 possible, missing_num = Sudoku.all_exist(arr)
                 if not possible:
                     return False, '%d not placeable in %s %d' % (missing_num, type_[t], k)
@@ -315,18 +315,18 @@ class Sudoku():
         i1, j1 = min(i0 + BOX_SIZE, self.n - 1), min(j0 + BOX_SIZE, self.n - 1)
         # check rows
         for i in range(i0, i1 + 1):
-            row = self.get_candidates((i, j0), (i, j1))
-            line = self.get_candidates(
-                (i, 0), (i, j0 - 1)) | self.get_candidates((i, j1 + 1), (i, self.n - 1))
+            row = self.get_candidates_box((i, j0), (i, j1))
+            line = self.get_candidates_box(
+                (i, 0), (i, j0 - 1)) | self.get_candidates_box((i, j1 + 1), (i, self.n - 1))
             uniques = row.difference(line)
             if uniques:
                 keeps.append(
                     ([(i, j) for j in range(j0, j1 + 1)], list(uniques)))
         # check columns
         for j in range(j0, j1 + 1):
-            col = self.get_candidates((i0, j), (i1, j))
-            line = self.get_candidates(
-                (0, j), (i0 - 1, j)) | self.get_candidates((i1 + 1, j), (self.n - 1, j))
+            col = self.get_candidates_box((i0, j), (i1, j))
+            line = self.get_candidates_box(
+                (0, j), (i0 - 1, j)) | self.get_candidates_box((i1 + 1, j), (self.n - 1, j))
             uniques = col.difference(line)
             if uniques:
                 keeps.append(

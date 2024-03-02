@@ -247,6 +247,34 @@ class SudokuTest(unittest.TestCase):
             s.flush_candidates()
             self.assertTrue(s.check_possible()[0])
 
+    def impossible_x_test(self):
+        # impossible
+        puzzles = [
+            # two 2s on a diagonal
+            '060050200000000060532008000000049103000100050000000007005010008004000006000006502',  
+            # two 7s on a diagonal
+            '030040200520006700000000000080020170000070000050000003407000032000600000000080691',
+        ]
+        for puzzle in puzzles:
+            puzzle = str2grid(puzzle)
+            s = Sudoku(puzzle, is_X_Sudoku=False)
+            s.flush_candidates()
+            self.assertTrue(s.check_possible()[0])
+            # now try with X-Sudoku rules:
+            s = Sudoku(puzzle, is_X_Sudoku=True)
+            s.flush_candidates()
+            self.assertFalse(s.check_possible()[0])
+        # possible
+        puzzles = [
+            '030040200520006700000000000080020170000070000050000003400000032000600000000080691',  
+            '060050200000000060532008000000049103000100050000000007005010008004000006000006500',  
+        ]
+        for puzzle in [puzzles[1]]:
+            puzzle = str2grid(puzzle)
+            s = Sudoku(puzzle)
+            s.flush_candidates()
+            self.assertTrue(s.check_possible()[0])
+
 
 def suite():
     "Set order of tests in ascending order of complexity and code required"
@@ -262,6 +290,7 @@ def suite():
     suite.addTest(SudokuTest('candidates_test'))
     suite.addTest(SudokuTest('candidates_advanced'))
     suite.addTest(SudokuTest('impossible_test'))
+    suite.addTest(SudokuTest('impossible_x_test'))
     # end game
     suite.addTest(SudokuTest('check_done'))
     return suite
