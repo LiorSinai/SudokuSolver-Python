@@ -38,6 +38,7 @@ class Sudoku():
                         cell_memberships.append(g)
                 row.append(cell_memberships)
             self.memberships.append(row)
+        # create a grid of viable candidates for each position
         candidates = []
         for i in range(n):
             row = []
@@ -89,8 +90,6 @@ class Sudoku():
             (4, 2), (4, 3), (4, 5), (4, 6)
         }
         self.groups['cross'] = cross
-        # create a grid of viable candidates for each position
-
 
     def get_values(self, group: str):
         values = [self.grid[i][j] for (i, j) in self.groups[group]]
