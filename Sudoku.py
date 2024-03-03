@@ -28,16 +28,16 @@ class Sudoku():
         if is_cross_Sudoku:
             self.create_cross()
         # create reverse maps to groups
-        self.cells = []
+        self.memberships = []
         for i in range(n):
             row = []
             for j in range(n):
-                cell = []
+                cell_memberships = []
                 for g in self.groups.values():
                     if (i, j) in g:
-                        cell.append(g)
-                row.append(cell)
-            self.cells.append(row)
+                        cell_memberships.append(g)
+                row.append(cell_memberships)
+            self.memberships.append(row)
         candidates = []
         for i in range(n):
             row = []
@@ -103,7 +103,7 @@ class Sudoku():
         return inds_box
 
     def get_neighbour_inds(self, r: int, c: int, flatten=False):
-        neighbours = self.cells[r][c]
+        neighbours = self.memberships[r][c]
         if flatten:
             return list(set().union(*neighbours))
         return neighbours
@@ -111,7 +111,7 @@ class Sudoku():
     def find_options(self, r: int, c: int) -> Set:
         nums = set(range(1, SIZE + 1))
         used = set()
-        for group in self.cells[r][c]:
+        for group in self.memberships[r][c]:
             used |= set([self.grid[i][j] for (i, j) in group])
         valid = nums.difference(used)
         return valid
