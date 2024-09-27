@@ -53,14 +53,14 @@ class SudokuTest(unittest.TestCase):
                  [8, 2, 7, 0, 0, 0, 0, 0, 0],
                  [9, 1, 8, 0, 0, 0, 0, 0, 0]]
         s = Sudoku(grid)
-        self.assertEqual(s.get_col(0), [1, 2, 3, 4, 5, 6, 7, 8, 9])
-        self.assertTrue(s.no_duplicates(s.get_col(0)))
-        self.assertEqual(s.get_col(1), [9, 8, 7, 6, 5, 4, 3, 2, 1])
-        self.assertTrue(s.no_duplicates(s.get_col(1)))
-        self.assertEqual(s.get_col(3), [4, 0, 0, 0, 0, 0, 0, 0, 0])
-        self.assertTrue(s.no_duplicates(s.get_col(3)))
-        self.assertEqual(s.get_col(2), [3, 1, 2, 3, 4, 5, 6, 7, 8])
-        self.assertFalse(s.no_duplicates(s.get_col(2)))
+        self.assertEqual(s.get_values('column 0'), [1, 2, 3, 4, 5, 6, 7, 8, 9])
+        self.assertTrue(s.no_duplicates(s.get_values('column 0')))
+        self.assertEqual(s.get_values('column 1'), [9, 8, 7, 6, 5, 4, 3, 2, 1])
+        self.assertTrue(s.no_duplicates(s.get_values('column 1')))
+        self.assertEqual(s.get_values('column 3'), [4, 0, 0, 0, 0, 0, 0, 0, 0])
+        self.assertTrue(s.no_duplicates(s.get_values('column 3')))
+        self.assertEqual(s.get_values('column 2'), [3, 1, 2, 3, 4, 5, 6, 7, 8])
+        self.assertFalse(s.no_duplicates(s.get_values('column 2')))
 
     
     def check_box_test(self):
@@ -74,18 +74,13 @@ class SudokuTest(unittest.TestCase):
                  [0, 0, 0, 0, 0, 0, 0, 0, 0],
                  [0, 0, 0, 0, 0, 0, 0, 0, 0]]
         s = Sudoku(grid)
-        # different indices for the upper left box:
         box = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-        self.assertEqual(s.get_box(0,0), box)
-        self.assertEqual(s.get_box(1,2), box)
-        self.assertEqual(s.get_box(2,2), box)
-        self.assertTrue(s.no_duplicates(s.get_box(0, 0)))
+        self.assertEqual(s.get_values('box (0,0)'), box)
+        self.assertTrue(s.no_duplicates(s.get_values('box (0,0)')))
         # different indices for the middle box:
         box = [1, 2, 2, 4, 5, 6, 7, 8, 8]
-        self.assertEqual(s.get_box(4,4), box)
-        self.assertEqual(s.get_box(3,3), box)
-        self.assertEqual(s.get_box(3,5), box)
-        self.assertFalse(s.no_duplicates(s.get_box(4, 4)))
+        self.assertEqual(s.get_values('box (3,3)'), box)
+        self.assertFalse(s.no_duplicates(s.get_values('box (3,3)')))
 
     
     def find_options_test(self):
@@ -139,7 +134,7 @@ class SudokuTest(unittest.TestCase):
         inds = [(7, j) for j in range(9)] # uniques: 8 at (7, 1)  and 6 at (7, 6)
         #self.assertEqual(s.get_unique(inds), [([(7, 6)], [6]), ([(7, 1)], [8])] ) #[(6, (7, 6)), (8, (7, 1))])
         self.assertEqual(s.get_unique(inds, type=[1]), [([(7, 6)], [6]), ([(7, 1)], [8])] )
-        inds = s.get_box_inds(5, 6)  # middle right box. unique 8 at (5,6)
+        inds = s.groups['box (3,6)']  # middle right box. unique 8 at (5,6)
         #self.assertEqual(s.get_unique(inds), [([(5, 6)], [8])])
         self.assertEqual(s.get_unique(inds, type=[1]), [([(5, 6)], [8])] )
         # test erase function
