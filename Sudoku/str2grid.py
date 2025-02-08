@@ -37,5 +37,5 @@ def grid2str(grid: List[List[int]]) -> str:
     return arr2str(flatten(grid))
 
 
-def str2grid(string: str) -> List[List[int]]:
-    return unflatten(str2arr(string))
+def str2grid(string: str, n=9) -> List[List[int]]:
+    return unflatten(str2arr(string), n=n)

@@ -22,7 +22,7 @@ class SudokuSolverTest(unittest.TestCase):
             puzzle, solution = list(map(str2grid, [puzzle, solution]))
             solution_set, done, _ = solve_sudoku(puzzle, verbose=False, all_solutions=False)
             self.assertTrue(done)
-            solver_sol = str2grid(solution_set[0])
+            solver_sol = solution_set[0]
             self.assertTrue(grid_equal(solution, solver_sol))
         # medium to hard Sudoku (some backtracking). From New York Times, 31 May 2020 - 2 June 2020
         puzzles = [
@@ -43,7 +43,7 @@ class SudokuSolverTest(unittest.TestCase):
             puzzle, solution =list(map(str2grid, [puzzle, solution]))
             solution_set, done, _ = solve_sudoku(puzzle, verbose=False, all_solutions=False)
             self.assertTrue(done)
-            solver_sol = str2grid(solution_set[0])
+            solver_sol = solution_set[0]
             self.assertTrue(grid_equal(solution, solver_sol))
 
 
@@ -113,7 +113,7 @@ class SudokuSolverTest(unittest.TestCase):
             puzzle, solution = str2grid(puzzle), str2grid(solution)
             solution_set, done, _ = solve_sudoku(puzzle, verbose=False, all_solutions=False)
             self.assertTrue(done)
-            solver_sol = str2grid(solution_set[0])
+            solver_sol = solution_set[0]
             self.assertTrue(grid_equal(solution, solver_sol))
 
 
@@ -132,7 +132,7 @@ class SudokuSolverTest(unittest.TestCase):
             puzzle, solution = str2grid(puzzle), str2grid(solution)
             solution_set, done, info = solve_sudoku(puzzle, verbose=False, all_solutions=False, is_X_Sudoku=True)
             self.assertTrue(done)
-            solver_sol = str2grid(solution_set[0])
+            solver_sol = solution_set[0]
             self.assertTrue(grid_equal(solution, solver_sol))
 
 
@@ -153,7 +153,7 @@ class SudokuSolverTest(unittest.TestCase):
             puzzle, solution = str2grid(puzzle), str2grid(solution)
             solution_set, done, info = solve_sudoku(puzzle, verbose=False, all_solutions=False, is_hyper_Sudoku=True)
             self.assertTrue(done)
-            solver_sol = str2grid(solution_set[0])
+            solver_sol = solution_set[0]
             self.assertTrue(grid_equal(solution, solver_sol))
 
     def test_solve_hyper_sudoku_x(self):
@@ -172,7 +172,7 @@ class SudokuSolverTest(unittest.TestCase):
                 is_hyper_Sudoku=True, is_X_Sudoku=True)
             self.assertTrue(done)
             self.assertEqual(len(solution_set), 1)
-            solver_sol = str2grid(solution_set[0])
+            solver_sol = solution_set[0]
             self.assertTrue(grid_equal(solution, solver_sol))
 
 

@@ -11,7 +11,7 @@ from typing import List
 import random
 import time
 
-from Sudoku.Sudoku import Sudoku
+from Sudoku.Sudoku import Sudoku, BOX_SIZE, SIZE
 from Sudoku.str2grid import str2grid, grid2str
 
 
@@ -41,10 +41,16 @@ def get_nonempty(A: List[List[int]]):
 
 def print_grid(grid: List[List[int]]) -> None:
         repr = ''
-        for row in grid:
-            repr += str(row) + '\n'
+        repr += '-' * SIZE * 2 + '\n'
+        for i, row in enumerate(grid):
+            repr += str(row[0])
+            for j in range(1, len(row)):
+                repr += ',' if j % BOX_SIZE != 0 else "|"
+                repr += str(row[j])
+            repr += '\n'
+            if (i+1) % BOX_SIZE == 0:
+                repr += '-' * SIZE * 2 + '\n'
         print(repr[:-1])
-
 
 def solve_sudoku_brute(grid: List[List[int]]):
     """
@@ -118,7 +124,7 @@ def solve_sudoku(grid: List[List[int]], verbose=True, all_solutions=False, **kwa
             if not edited:  # changed nothing in this round -> either done or stuck
                 if solved:
                     progress += progress_factor
-                    solution_set.append(grid2str(game.grid.copy()))
+                    solution_set.append(game.grid.copy())
                     return True
                 else:
                     min_guesses = get_least_candidates(game)
@@ -205,11 +211,13 @@ if __name__ == '__main__':
         grid[i][j] = 0
 
     verbose       = True
-    all_solutions = True
+    all_solutions = False
 
     t0 = time.time()
     print_grid(grid)
-    nclues = 81 - puzzle.count('.') - puzzle.count('0')
+    num_blanks = sum([row.count(0) for row in grid])
+    num_cells = sum([len(row) for row in grid]) 
+    nclues = num_cells - num_blanks
     print("num clues: %d" % nclues)
     ## solve
     solution_set, done, info = solve_sudoku(
@@ -225,8 +233,8 @@ if __name__ == '__main__':
         print("%-14s: %d" % (key, info[key]))
 
     if done:
-        solver_grid = str2grid(solution_set[0])
-        if 'solution' in locals():
+        solver_grid = solution_set[0]
+        if solution:
             grid_solution = str2grid(solution)  
             print("The solution is correct: ", grid_equal(solver_grid, grid_solution))
         print_grid(solver_grid)
