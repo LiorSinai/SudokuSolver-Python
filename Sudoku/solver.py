@@ -11,8 +11,8 @@ from typing import List
 import random
 import time
 
-from Sudoku import Sudoku
-from str2grid import str2grid, grid2str
+from Sudoku.Sudoku import Sudoku
+from Sudoku.str2grid import str2grid, grid2str
 
 
 def grid_equal(A: List[List[int]], B: List[List[int]]):

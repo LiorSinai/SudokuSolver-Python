@@ -6,8 +6,8 @@ Solve many puzzles at once
 
 """
 
-from solver import solve_sudoku, str2grid
-from Sudoku import SudokuException
+from Sudoku.solver import solve_sudoku, str2grid
+from Sudoku.Sudoku import SudokuException
 import time
 from statistics import mean, stdev
 

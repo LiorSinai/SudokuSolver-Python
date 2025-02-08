@@ -6,9 +6,9 @@ Sudoku Solver
 
 """
 
-from Sudoku import Sudoku, SudokuException
-from solver import grid_equal
-from str2grid import str2grid
+from Sudoku.Sudoku import Sudoku, SudokuException
+from Sudoku.solver import grid_equal
+from Sudoku.str2grid import str2grid
 import unittest
 
 

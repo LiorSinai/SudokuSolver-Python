@@ -1,5 +1,5 @@
-from Sudoku import Sudoku
-from solver import solve_sudoku, grid_equal, str2grid
+from Sudoku.Sudoku import Sudoku
+from Sudoku.solver import solve_sudoku, grid_equal, str2grid
 import unittest
 
 

@@ -7,7 +7,7 @@ Sudoku Solver UI by Erfan Paslar
 
 import eel  # For UI
 from SudokuSolver import solve_sudoku, str2grid
-from Sudoku import Sudoku
+from Sudoku.Sudoku import Sudoku
 
 #### For UI ####
 eel.init('.//UI')  # path of the webpage folder

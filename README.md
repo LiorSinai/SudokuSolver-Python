@@ -64,6 +64,19 @@ See [www.SudokuWiki.org][sudokuwiki] for more information on strategies.
 
 The code also implements a check to determine if the Sudoku is solvable. This is run at the start of each solving task.
 
+## Test
+
+From the root directory, run
+```bash
+python -m test.test_solver 
+python -m test.test_Sudoku
+```
+
+Or run:
+```bash
+python solve_file.py
+```
+
 ## Credit
 
 - User Interface: Erfan Paslar.
