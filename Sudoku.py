@@ -12,6 +12,10 @@ SIZE = 9
 BOX_SIZE = 3
 
 
+class SudokuException(Exception):
+    pass
+
+
 class Sudoku():
     def __init__(self, grid: List[List[int]], is_X_Sudoku=False, is_hyper_Sudoku=False, is_cross_Sudoku=False):
         n = len(grid)
@@ -56,9 +60,23 @@ class Sudoku():
 
     def get_row(self, r: int) -> List[int]:
         return self.grid[r]
+    
+    def get_rows_inds(self):
+        rows = []
+        for i in range(self.n):
+            inds = [(i, j) for j in range(self.n)]
+            rows.append(inds)
+        return rows
 
     def get_col(self, c: int) -> List[int]:
         return [row[c] for row in self.grid]
+    
+    def get_cols_inds(self):
+        cols = []
+        for j in range(self.n):
+            inds = [(i, j) for i in range(self.n)]
+            cols.append(inds)
+        return cols
 
     def get_box_inds(self, r: int, c: int) -> List[Tuple[int, int]]:
         inds_box = []
@@ -68,6 +86,14 @@ class Sudoku():
             for j in range(j0, j0 + BOX_SIZE):
                 inds_box.append((i, j))
         return inds_box
+    
+    def get_boxes_inds(self):
+        inds_box = []
+        for i0 in range(0, self.n, BOX_SIZE):
+            for j0 in range(0, self.n, BOX_SIZE):
+                inds = self.get_box_inds(i0, j0)
+                inds_box.append(inds)
+        return inds_box
 
     def get_box(self, r: int, c: int) -> List[int]:
         box = []
@@ -75,7 +101,7 @@ class Sudoku():
             box.append(self.grid[i][j])
         return box
 
-    def get_neighbour_inds(self, r: int, c: int, flatten=False):
+    def get_neighbour_blocks(self, r: int, c: int):
         inds_row = [(r, j) for j in range(self.n)]
         inds_col = [(i, c) for i in range(self.n)]
         inds_box = self.get_box_inds(r, c)
@@ -83,9 +109,12 @@ class Sudoku():
         for inds in self.special:
             if (r, c) in inds:
                 neighbours.append(list(inds))
-        if flatten:
-            return list(set().union(*neighbours))
         return neighbours
+    
+    def get_neighbour_inds(self, r: int, c: int):
+        blocks = self.get_neighbour_blocks(r, c)
+        inds = list(set().union(*blocks))
+        return inds
 
     def find_options(self, r: int, c: int) -> Set:
         nums = set(range(1, SIZE + 1))
@@ -156,9 +185,8 @@ class Sudoku():
         " get candidates within two corners of a rectangle/column/row"
         candidates = set()
         for (i, j) in indices:
-                candidates = candidates | self.candidates[i][j]
+            candidates = candidates | self.candidates[i][j]
         return candidates
-    
     
     def get_candidates_box(self, start: Tuple[int, int], end: Tuple[int, int]):
         " get candidates within two corners of a rectangle/column/row"
@@ -170,30 +198,29 @@ class Sudoku():
 
     def check_possible(self):
         """ check if each row/column/box can have all unique elements"""
-        # get rows
-        rows = []
-        for i in range(self.n):
-            inds = [(i, j) for j in range(self.n)]
-            rows.append(inds)
-        # get columns
-        cols = []
-        for j in range(self.n):
-            inds = [(i, j) for i in range(self.n)]
-            cols.append(inds)
-        # get specials
+        row_inds = self.get_rows_inds()
+        cols_inds = self.get_cols_inds()
         specials = [list(s) for s in self.special]
         # check rows, columns and diagonals
         type_ = ['row', 'column', 'special']
-        for t, inds_set in enumerate([rows, cols, specials]):
+        for t, inds_set in enumerate([row_inds, cols_inds, specials]):
             for k, inds in enumerate(inds_set):
-                arr = [self.grid[i][j] for i, j in inds]
-                if not Sudoku.no_duplicates(arr):
-                    raise SudokuException('Duplicate values in %s %d' % (type_[t], k))
-                arr += list(self.get_candidates(inds))
-                possible, missing_num = Sudoku.all_exist(arr)
-                if not possible:
-                    raise SudokuException('%d not placeable in %s %d' % (missing_num, type_[t], k))
-        # check boxes
+                self.assert_possible(inds, type_=type_[t], k=k)
+        self.assert_possible_boxes()
+        return True
+    
+    def assert_possible(self, indices: List[Tuple], type_='indices', k=0):
+        #for k, inds in enumerate(inds_set):
+        arr = [self.grid[i][j] for i, j in indices]
+        if not Sudoku.no_duplicates(arr):
+            raise SudokuException('Duplicate values in %s %d' % (type_, k))
+        arr += list(self.get_candidates(indices))
+        possible, missing_num = Sudoku.all_exist(arr)
+        if not possible:
+            raise SudokuException('%d not placeable in %s %d' % (missing_num, type_, k))
+        return True
+    
+    def assert_possible_boxes(self):
         for i0 in range(0, self.n, BOX_SIZE):
             for j0 in range(0, self.n, BOX_SIZE):
                 arr = self.get_box(i0, j0)[:]
@@ -214,26 +241,13 @@ class Sudoku():
         self.grid[r][c] = x
         self.candidates[r][c] = set()
         # remove candidate x in neighbours
-        inds_neighbours = self.get_neighbour_inds(r, c, flatten=True)
+        inds_neighbours = self.get_neighbour_inds(r, c)
         erased = [(r, c)]  # set of indices for constraint propogration
         erased += self.erase([x], inds_neighbours, [])
         # constraint propagation, through every index that was changed
         while erased and constraint_prop:
             i, j = erased.pop()
-            inds_neighbours = self.get_neighbour_inds(i, j, flatten=False)
-            for inds in inds_neighbours:
-                uniques = self.get_unique(inds, type=[1, 2, 3])
-                for inds_combo, combo in uniques:
-                    # passing back the erased here doesn't seem to be very helpful
-                    self.set_candidates(combo, inds_combo)
-                    erased += self.erase(combo, inds, inds_combo)
-            inds_box = self.get_box_inds(i, j)
-            pointers = self.pointing_combos(inds_box)
-            for line, inds_pointer, num in pointers:
-                erased += self.erase(num, line, inds_pointer)
-        # keeps = self.box_line_reduction(inds_box) # doesn't work??
-        # for inds_keep, nums in keeps:
-        #     self.erase(nums, inds_box, inds_keep)
+            erased += self.apply_strategies(i, j)
 
     def erase(self, nums: List[int], indices: List[Tuple[int, int]], keep: List[Tuple[int, int]]):
         """ erase nums as candidates in indices, but not in keep"""
@@ -248,6 +262,24 @@ class Sudoku():
                     edited = True
             if edited:
                 erased.append((i, j))
+        return erased
+    
+    def apply_strategies(self, i:int, j: int):
+        erased = []
+        inds_neighbours = self.get_neighbour_blocks(i, j)
+        for inds in inds_neighbours:
+            uniques = self.get_unique(inds, type=[1, 2, 3])
+            for inds_combo, combo in uniques:
+                # passing back the erased here doesn't seem to be very helpful
+                self.set_candidates(combo, inds_combo)
+                erased += self.erase(combo, inds, inds_combo)
+        inds_box = self.get_box_inds(i, j)
+        pointers = self.pointing_combos(inds_box)
+        for line, inds_pointer, num in pointers:
+            erased += self.erase(num, line, inds_pointer)
+        # keeps = self.box_line_reduction(inds_box) # doesn't work??
+        # for inds_keep, nums in keeps:
+        #     self.erase(nums, inds_box, inds_keep)
         return erased
 
     def set_candidates(self, nums: List[int], indices: List[Tuple[int, int]]):
@@ -345,18 +377,6 @@ class Sudoku():
                     ([(i, j) for i in range(i0, i1 + 1)], list(uniques)))
         return keeps
 
-    def get_all_units(self):
-        # get indices for each set
-        inds_set = []
-        for i in range(self.n):
-            inds = [(i, j) for j in range(self.n)]
-            inds_set.append(inds)
-        # check in column
-        for j in range(self.n):
-            inds = [(i, j) for i in range(self.n)]
-            inds_set.append(inds)
-        return inds_set
-
     def get_all_boxes(self):
         inds_box = []
         for i0 in range(0, self.n, BOX_SIZE):
@@ -368,9 +388,10 @@ class Sudoku():
     def flush_candidates(self) -> None:
         """set candidates across the whole grid, according to logical strategies"""
         # get indices for each set
-        inds_box = self.get_all_boxes()
-        inds_set = self.get_all_units()
-        inds_set.extend(inds_box)
+        inds_box = self.get_boxes_inds()
+        inds_row = self.get_rows_inds()
+        inds_col = self.get_cols_inds()
+        inds_set = inds_box + inds_row + inds_col
         for _ in range(1):  # repeat this process in case changes are made
             # apply strategies
             for inds in inds_set:
@@ -388,6 +409,4 @@ class Sudoku():
                 # keeps = self.box_line_reduction(inds)
                 # for inds_keep, nums in keeps:
                 #     self.erase(nums, inds, inds_keep)
-                    
-class SudokuException(Exception):
-    pass
+
