@@ -75,6 +75,7 @@ python -m test.test_Sudoku
 Or run:
 ```bash
 python solve_file.py
+python -m Sudoku.solver
 ```
 
 ## Credit
