@@ -121,21 +121,14 @@ def solve_sudoku(grid: List[List[int]], verbose=True, all_solutions=False, **kwa
                     solution_set.append(grid2str(game.grid.copy()))
                     return True
                 else:
-                    # Find the box with the least number of options and take a guess
-                    # The place_and_erase() call changes this dynamically
-                    min_guesses = (game.n + 1, -1)
-                    for i in range(game.n):
-                        for j in range(game.n):
-                            options = game.candidates[i][j]
-                            if len(options) < min_guesses[0] and len(options) > 1:
-                                min_guesses = (len(options), (i, j))
+                    min_guesses = get_least_candidates(game)
                     i, j = min_guesses[1]
                     options = game.candidates[i][j]
                     # backtracking check point:
                     progress_factor *= (1/len(options))
-                    for y in options:
+                    for guess in options:
                         game_next = deepcopy(game)
-                        game_next.place_and_erase(i, j, y)
+                        game_next.place_and_erase(i, j, guess)
                         # game_next.flush_candidates() # full grid cleaning
                         solved = solve(
                             game_next, depth=depth+1, progress_factor=progress_factor)
@@ -170,6 +163,17 @@ def solve_sudoku(grid: List[List[int]], verbose=True, all_solutions=False, **kwa
         'nsolutions': len(solution_set),
         }
     return solution_set, solved, info
+
+
+def get_least_candidates(game: Sudoku):
+    least_candidates = (game.n + 1, (0, 0))
+    for i in range(game.n):
+        for j in range(game.n):
+            if game.grid[i][j] == 0:
+                options = game.candidates[i][j]
+                if len(options) < least_candidates[0]:
+                    least_candidates = (len(options), (i, j))
+    return least_candidates
 
 
 if __name__ == '__main__':
