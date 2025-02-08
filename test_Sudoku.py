@@ -14,7 +14,7 @@ import unittest
 
 class SudokuTest(unittest.TestCase):
     #def setup(self):
-    def check_unique_test(self):
+    def test_unique_test(self):
         s = Sudoku([[1]])
         arr = [1,2 ,3, 4, 5]
         self.assertTrue(s.no_duplicates(arr))
@@ -26,7 +26,7 @@ class SudokuTest(unittest.TestCase):
         self.assertFalse(s.no_duplicates(arr))
 
 
-    def check_row_test(self):
+    def test_rows(self):
         grid = [[1, 2, 3, 4, 5, 6, 7, 8, 9],
                 [2, 0, 0, 0, 0, 0, 0, 0, 0], 
                 [3, 3, 0, 0, 0, 0, 0, 0, 0], 
@@ -42,7 +42,7 @@ class SudokuTest(unittest.TestCase):
         self.assertFalse(s.no_duplicates(grid[2]))
 
 
-    def check_col_test(self):
+    def test_cols(self):
         grid = [[1, 9, 3, 4, 5, 6, 7, 8, 9],
                  [2, 8, 1, 0, 0, 0, 0, 0, 0], 
                  [3, 7, 2, 0, 0, 0, 0, 0, 0], 
@@ -63,7 +63,7 @@ class SudokuTest(unittest.TestCase):
         self.assertFalse(s.no_duplicates(s.get_col(2)))
 
     
-    def check_box_test(self):
+    def test_boxes(self):
         grid = [[1, 2, 3, 4, 5, 6, 7, 8, 9],
                  [4, 5, 6, 0, 0, 0, 0, 0, 0], 
                  [7, 8, 9, 0, 0, 0, 0, 0, 0], 
@@ -88,7 +88,7 @@ class SudokuTest(unittest.TestCase):
         self.assertFalse(s.no_duplicates(s.get_box(4, 4)))
 
     
-    def find_options_test(self):
+    def test_find_options(self):
         grid = [
             [5, 3, 0, 0, 7, 0, 0, 0, 0],
             [6, 0, 0, 1, 9, 5, 0, 0, 0],
@@ -107,7 +107,7 @@ class SudokuTest(unittest.TestCase):
         self.assertEqual(s.find_options(8, 6), {1, 3, 4, 6})
 
 
-    def candidates_test(self):
+    def test_candidates(self):
         grid = [
             [5, 3, 0, 0, 7, 0, 0, 0, 0],
             [6, 0, 0, 1, 9, 5, 0, 0, 0],
@@ -149,7 +149,7 @@ class SudokuTest(unittest.TestCase):
         self.assertEqual(col, [set(), {2, 4, 7}, set(), {2, 5 ,9}, {2, 5, 6, 9}, {3, 5, 9}, {3, 4, 5, 7, 9}, {2, 3, 7}, {2, 3, 4, 5}])
 
 
-    def candidates_advanced(self):
+    def test_candidates_advanced(self):
         grid = [
             [0, 8, 0, 0, 0, 1, 2, 0, 6],
             [0, 0, 0, 0, 2, 0, 0, 0, 0],
@@ -202,7 +202,7 @@ class SudokuTest(unittest.TestCase):
         self.assertEqual(uniques, ([(1, 8), (2, 8), (5, 8)], (4, 8, 7)) )
         
 
-    def check_done(self):
+    def test_done(self):
         # Easy 
         puzzle = '280070309600104007745080006064830100102009800000201930006050701508090020070402050'
         solution= '281576349693124587745983216964835172132749865857261934426358791518697423379412658'
@@ -221,14 +221,20 @@ class SudokuTest(unittest.TestCase):
         self.assertTrue(s.check_done())
 
 
-    def impossible_test(self):
+    def test_impossible(self):
         # impossible
         puzzles = [
             # From https://norvig.com/sudoku.html  -> column 4, no 1 possible because of triple 5-6 doubles and triple 1s
             '.....5.8....6.1.43..........1.5........1.6...3.......553.....61........4.........',  
-            # obvious doubles
-            '12.......34...............5...........5..........................................',  
-            '11.......34...............5......................................................',
+            # no place for 5 
+            "12.......34...............5...........5..........................................",
+            # no place for 1
+            "..........1..1..1................................................................",  
+            "..........1..........................1..........................1................",
+            # duplicate 1s
+            "11.......34...............5......................................................",
+            "12.......14...............5......................................................",
+            "12.......31...............5......................................................",
         ]
         for puzzle in puzzles:
             puzzle = str2grid(puzzle)
@@ -247,7 +253,7 @@ class SudokuTest(unittest.TestCase):
             s.flush_candidates()
             self.assertTrue(s.check_possible())
 
-    def impossible_x_test(self):
+    def test_impossible_x(self):
         # impossible
         puzzles = [
             # two 2s on a diagonal
@@ -280,19 +286,19 @@ def suite():
     "Set order of tests in ascending order of complexity and code required"
     suite = unittest.TestSuite()
     # basic checks
-    suite.addTest(SudokuTest('check_unique_test'))
-    suite.addTest(SudokuTest('check_row_test'))
-    suite.addTest(SudokuTest('check_col_test'))
-    suite.addTest(SudokuTest('check_box_test'))
+    suite.addTest(SudokuTest('test_unique_test'))
+    suite.addTest(SudokuTest('test_rows'))
+    suite.addTest(SudokuTest('test_cols'))
+    suite.addTest(SudokuTest('test_boxes'))
     # find options
-    suite.addTest(SudokuTest('find_options_test'))
+    suite.addTest(SudokuTest('test_find_options'))
     # candidates
-    suite.addTest(SudokuTest('candidates_test'))
-    suite.addTest(SudokuTest('candidates_advanced'))
-    suite.addTest(SudokuTest('impossible_test'))
-    suite.addTest(SudokuTest('impossible_x_test'))
+    suite.addTest(SudokuTest('test_candidates'))
+    suite.addTest(SudokuTest('test_candidates_advanced'))
+    suite.addTest(SudokuTest('test_impossible'))
+    suite.addTest(SudokuTest('test_impossible_x'))
     # end game
-    suite.addTest(SudokuTest('check_done'))
+    suite.addTest(SudokuTest('test_done'))
     return suite
 
 

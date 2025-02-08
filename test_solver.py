@@ -4,7 +4,7 @@ import unittest
 
 
 class SudokuSolverTest(unittest.TestCase):
-    def check_solver(self):
+    def test_solver(self):
         # check solver using manually solved puzzles
         # easy Sudokus (no backtracking required). From New York Times, 31 May 2020 - 2 June 2020
         puzzles = [
@@ -47,7 +47,7 @@ class SudokuSolverTest(unittest.TestCase):
             self.assertTrue(grid_equal(solution, solver_sol))
 
 
-    def check_solved_puzzles(self):
+    def test_solved_puzzles(self):
         # these puzzles were sovled with the solver. This is to check solutions still hold.
         puzzles = [
             # from https://dev.to/aspittel/how-i-finally-wrote-a-sudoku-solver-177g
@@ -117,7 +117,7 @@ class SudokuSolverTest(unittest.TestCase):
             self.assertTrue(grid_equal(solution, solver_sol))
 
 
-    def solve_X_sudoku(self):
+    def test_solve_X_sudoku(self):
         puzzles = [
             (
                 '060050200000000060532008000000049103000100050000000007005010008004000006000006500',
@@ -136,7 +136,7 @@ class SudokuSolverTest(unittest.TestCase):
             self.assertTrue(grid_equal(solution, solver_sol))
 
 
-    def solve_hyper_sudoku(self):
+    def test_solve_hyper_sudoku(self):
         puzzles = [
             # 711 solutions in general, 1 with hyper Sudoku
             (
@@ -156,7 +156,7 @@ class SudokuSolverTest(unittest.TestCase):
             solver_sol = str2grid(solution_set[0])
             self.assertTrue(grid_equal(solution, solver_sol))
 
-    def solve_hyper_sudoku_x(self):
+    def test_solve_hyper_sudoku_x(self):
         puzzles = [
             # From Hyper Sudoku X: 100 Hard Puzzles by Peter Ritmeester 
             # Many solutions in general, 747 X Sudoku solutions, 76 hyper Sudoku solutions, 1 Hyper X solution
@@ -180,11 +180,11 @@ def suite():
     "Set order of tests in ascending order of complexity and code required"
     suite = unittest.TestSuite()
     # smoke test
-    suite.addTest(SudokuSolverTest('check_solver'))
-    suite.addTest(SudokuSolverTest('check_solved_puzzles'))
-    suite.addTest(SudokuSolverTest('solve_X_sudoku'))
-    suite.addTest(SudokuSolverTest('solve_hyper_sudoku'))
-    suite.addTest(SudokuSolverTest('solve_hyper_sudoku_x'))
+    suite.addTest(SudokuSolverTest('test_solver'))
+    suite.addTest(SudokuSolverTest('test_solved_puzzles'))
+    suite.addTest(SudokuSolverTest('test_solve_X_sudoku'))
+    suite.addTest(SudokuSolverTest('test_solve_hyper_sudoku'))
+    suite.addTest(SudokuSolverTest('test_solve_hyper_sudoku_x'))
     return suite
 
 
